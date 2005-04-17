@@ -233,6 +233,7 @@ find_exe()
 # Syntax: find_func func_name [lib_name]
 find_func()
 {
+	rc=1
   mode="lib"
   func="$1"
   name="$1"
@@ -286,18 +287,21 @@ find_func()
 		eval HAVE_$func="yes"
     echo " found!"
     echo "find_func: funciton $func found." >> configure.log
+		rc=0
   else
     echo " none."
     echo "find_func: funciton $func not found, compiler log follows." >> configure.log
     sed -e 's/^/find_func: > /g' < $MDF_TEMPE >> configure.log
   fi
   echo "find_func:" >> configure.log
+	return $rc
 }
 
 
 # Syntax: find_lib lib
 find_lib()
 {
+	rc=1
   comp="$CC -x c -o $MDF_TEMPO $MDF_TEMPC -l$1"
   echo -n "int main(int argc, const char **argv) { return 1; }" > $MDF_TEMPC
 
@@ -314,20 +318,24 @@ find_lib()
     DEFS="$DEFS HAVE_lib$1"
     echo " found!"
     echo "find_lib: library $1 found." >> configure.log
+		rc=0
   else
     echo " none."
     echo "find_lib: library $1 not found, compiler log follows." >> configure.log
     sed -e 's/^/find_lib: > /g' < $MDF_TEMPE >> configure.log
   fi
   echo "find_lib:" >> configure.log
+	return $rc
 }
 
 
 # Syntax: find_framework name
 find_framework()
 {
+	rc=1
+
   if [ "$OSNAME" != "darwin" ]; then
-    return
+    return $rc
   fi
 
   comp="$CC -x c -o $MDF_TEMPO $MDF_TEMPC -framework $1"
@@ -346,6 +354,7 @@ find_framework()
         INCDIR="$INCDIR $i/$1.framework/Headers"
 				DEFS="$DEFS HAVE_$1"
 				eval HAVE_$1="yes"
+				rc=0
 				break
       fi
     done
@@ -355,6 +364,7 @@ find_framework()
     sed -e 's/^/find_framework: > /g' < $MDF_TEMPE >> configure.log
   fi
   echo "find_framework:" >> configure.log
+	return $rc
 }
 
 
