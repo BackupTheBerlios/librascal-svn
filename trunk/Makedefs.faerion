@@ -8,7 +8,7 @@
 ### PHASE ZERO.  Read user settings and apply defaults.
 
 MDF_SOEXT ?= so
-DISTMASK ?= *.h *.c *.cc *.css *.docbook *.dtd GNUmakefile Makefile
+DISTMASK ?= *.h *.c *.cc *.css *.docbook *.dtd *.exp GNUmakefile Makefile
 DISTLIST += Makedefs.faerion GNUmakefile configure configure.in LICENSE exports
 WORKLIST += $(wildcard $(OBJS) $(PROG) $(PROG).def $(PROG).a .docbook.paged .depend)
 

@@ -36,3 +36,5 @@ install: fake
 
 tidy:
 	find . -type f \( -name '*.o' -o -name '.*' -o -name '*.dylib' \) | xargs rm -rf docbook/html Makedefs.faerion.include configure.log
+
+dist: dist-default

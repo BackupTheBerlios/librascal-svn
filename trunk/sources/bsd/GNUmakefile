@@ -10,7 +10,7 @@ DEFS   += BUILD_RASCAL RASCAL_HELPERS
 ARCH    = ../common/rascal.a
 LIBS   += faeutil stdc++
 DIRS    = ../common
-EXPS    = exports
+EXPS    = librascal.exp
 
 ifneq ($(MDF_OSNAME),NT)
   LIBS += resolv
