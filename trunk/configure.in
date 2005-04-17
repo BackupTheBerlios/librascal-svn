@@ -477,7 +477,8 @@ _EOF_
   sed -e 's/=\(.*$\)/ "\1"/g' $fname.tmp > $fname
   rm $fname.tmp
   echo "Wrote $fname"
-  DEFS=HAVE_configure_h
+	DEFS="HAVE_configure_h"
+	CFLAGS="$CFLAGS -include '`pwd`/configure.h'"
 }
 
 

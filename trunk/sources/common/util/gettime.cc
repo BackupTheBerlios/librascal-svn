@@ -2,10 +2,6 @@
 // Copyright (c) 2002-2004 hex@faerion.oss and others.
 // $Id$
 
-#if defined(HAVE_configure_h)
-# include "../../../configure.h"
-#endif
-
 #include <stdarg.h>
 #ifdef _WIN32
 # include <windows.h>

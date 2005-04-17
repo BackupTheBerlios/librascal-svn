@@ -7,9 +7,6 @@
 // This file implements the DNS monitor, a thread that resends queries that
 // haven't been replied in a certain period of time.
 
-#if defined(HAVE_configure_h)
-# include "../../../configure.h"
-#endif
 #include <errno.h>
 #include <stdlib.h>
 #ifdef _DEBUG

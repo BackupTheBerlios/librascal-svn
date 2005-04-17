@@ -7,10 +7,6 @@
 #ifndef __common_rascal_h
 #define __common_rascal_h
 
-#if defined(HAVE_configure_h)
-# include "../../configure.h"
-#endif
-
 #if defined(_WIN32)
 # include <windows.h>
 # include <winsock2.h>
