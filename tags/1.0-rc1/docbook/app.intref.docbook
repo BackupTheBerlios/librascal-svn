@@ -1,0 +1,49 @@
+<title>Internal reference</title>
+<para>The intended audience of this section is the developers willing to port the library onto a yet unsupported platform.  Regular users may ignore this section for they will never deal with anything described in it.  The mission of this section is to describe all resources available for use.  Re-miplementing functions covered by the described classes is not recommended.</para>
+
+<section id="datachain">
+	<title>datachain</title>
+	<para>This class implements data stream storage in fragments of a fixed small size (about 2048 bytes each).  The class provides means for copying data from the data chain into a linear buffer and extracting EOL-terminated lines of text.  The class uses <link linkend="pageman">paged memory allocation</link> and is efficient when it comes to chain extension or truncation.  Thread locking is provided internally by the class.</para>
+	<para>The <classname>datachain</classname> class is a header that manages a number of linked <classname>datachainitem</classname> objects.  Each object can hold 2048 bytes of data and information of how many bytes are <varname>used</varname> in each item and how many are <varname>dead</varname>; the latter means the bytes that are already processed and should be discarded (this is to avoid moving data as it is peeked from the chain).  The amount of <varname>dead</varname> bytes never exceeds the number of <varname>used</varname> bytes.</para>
+	<programlisting id="datachain.ext_used">void ext_used(char *&amp;, unsigned int &amp;);</programlisting>
+	<para>This method finds the first element in which not all bytes are used and returns a pointer to the first unused byte and the number of unused bytes in the chain element.  If there is no element with unused bytes, a new one is allocated.  This opeartion is typically performed when reading needs to be done: you request a space to read to, then fix it with a call to <link linkend="datachain.add_used"><function>add_used</function></link>.</para>
+	<programlisting id="datachain.add_used">void add_used(unsigned int);</programlisting>
+	<para>This method marks the specified number of unused bytes as used.  Typically this is done after requesting unused space by a call to <link linkend="datachain.ext_used"><function>ext_used</function></link> to "fix" the data after it was copied into the buffer, thus making it actually visible and available.</para>
+	<para>The <classname>datachain</classname> class tracks the chain element that was last extended with a call to <link linkend="datachain.ext_used"><function>ext_used</function></link> and, until a subsequent call to <link linkend="datachain.add_used"><function>add_used</function></link> follows, all further calls to <link linkend="datachain.ext_used"><function>ext_used</function></link> will fail by returning a zero sized buffer.</para>
+</section>
+
+<section id="pageman">
+	<title>pageman</title>
+	<para>This is the memory allocation class that supports paged object allocation to, basically, decrease memory fragmentation.  This class should be used for objects more or less frequently allocated not on stack.  Typical use for this class:</para>
+	<programlisting>#include "pageman.h"
+
+class myclass {
+	pageman pmgr&lt;myclass&gt;(100); // 100 is the size of a page
+public:
+	void* operator new(unsigned int size) { return pmgr.alloc(); }
+	void operator delete(void *object) { pmgr.free(object); }
+};</programlisting>
+	<para>The content of objects allocated this way is not initialized; neither constructor nor destructor are called for objects managed by the page manager.</para>
+	<para>Overrunning the borders of an allocated object by at least one byte will lead to fatal damage during following operation on that pageman object.</para>
+	<para>There is a helper <function>CACHED_ALLOCATORS</function> macro which receives the name of a <classname>pageman</classname> object and declares operators <function>new</function> and <function>delete</function>.  When used, the above class declaration is simplified up to the following:</para>
+	<programlisting>
+class myclass {
+	pageman pmgr&lt;myclass&gt;(100);
+public:
+	CACHED_ALLOCATORS(pmgr);
+};
+</programlisting>
+</section>
+
+<section id="stock">
+	<title>stock</title>
+	<para>A protected container class used to hide pointers from the client application.  Maps pointers to unique identifiers.  Detects modified identifiers and disallows them from use (to prevent memory access violation).  Defined in <filename>stock.h</filename>, not defined in standard header.</para>
+	<para>Memory allocation is paged, page size is customizable and defaults to 100.  Object list access is very fast and involves no array scan.  The only exception is the allocation of a new page, which involves initialization of an array of 100 integers.</para>
+	<para>Objects stored inside a <classname>stock</classname> class must be fully relocatable.  Never store pointers to these objects, they may become invalid after container extension.  Typically, you will only want to store pointers in a <classname>stock</classname> class.</para>
+	<programlisting>int stock&lt;T&gt;::add(T obj);</programlisting>
+	<para>Inserts an object into the container.  Currently, the class can store up to 65536 objects.  Inserting more objects will result in an error indicated by a negative result value.  The same negative value is returned if a memory allocation error occurs.  Otherwise a positive object index is returned; zero is a valid index.</para>
+	<programlisting>bool stock&lt;T&gt;::get(int idx, T&amp; obj);</programlisting>
+	<para>Extracts an object from the container.  Returns <constant>true</constant> on success, <constant>false</constant> if the object could not be found.</para>
+	<programlisting>bool stock&lt;T&gt;::remove(int idx);</programlisting>
+	<para>Removes an object from the list.  Returns <constant>true</constant> if the object was successfully removed, <constant>false</constant> if there was no such object.  Removing an object does not involve memory allocation; the slot is marked available for reuse.  The id of a removed object becomes invalid and all further operations on it will fail.</para>
+</section>

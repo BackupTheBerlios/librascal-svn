@@ -1,0 +1,9 @@
+<!ENTITY product "librascal">
+<!ENTITY optional "<emphasis>OPTIONAL</emphasis>">
+
+<!ENTITY chintroduction SYSTEM "ch.intro.docbook">
+<!ENTITY chimplementation SYSTEM "ch.impl.docbook">
+<!ENTITY chtodo SYSTEM "ch.todo.docbook">
+<!ENTITY app.typeref SYSTEM "app.typeref.docbook">
+<!ENTITY app.funcref SYSTEM "app.funcref.docbook">
+<!ENTITY app.intref SYSTEM "app.intref.docbook">

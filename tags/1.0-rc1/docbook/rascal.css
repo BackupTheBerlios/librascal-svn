@@ -1,0 +1,138 @@
+/*********************************************************************
+ *** Set up font families
+ *********************************************************************/
+
+body, p, li, tt, .varname, .function {
+	font-family: Arial, sans-serif;
+}
+
+h1, h2, h3 {
+	font-family: Trebuchet MS, Tahoma, sans-serif;
+}
+
+pre {
+	font-family: monospace;
+}
+
+body {
+	padding: 0;
+	margin: .5em 8em .5em 4em;
+	background-color: white;
+	color: black;
+	font-size: 12pt;
+}
+
+p, li {
+	line-height: 1.25em;
+	margin-top: .5em;
+	margin-bottom: .5em;
+}
+
+h3 {
+	font-weight: bold;
+	margin-top: 1.5em;
+	margin-bottom: 1em;
+}
+
+.type {
+	font-weight: bold;
+}
+
+ul li {
+	list-style: disc;
+}
+
+dt {
+	margin-top: .25em;
+	margin-bottom: .25em;
+}
+
+.hint {
+	border-bottom: dotted black 1px;
+	cursor: help;
+}
+
+div.code .hint {
+	border: none;
+	font-style: italic;
+}
+
+td {
+	vertical-align: top;
+}
+
+pre.programlisting {
+	padding: .5em;
+	background-color: #dddddd;
+	border: solid gray 1px;
+}
+
+pre.programlisting a {
+	color: black;
+	text-decoration: none;
+}
+
+pre.programlisting a:hover {
+	text-decoration: underline;
+}
+
+.navheader, .navfooter {
+	font-style: italic;
+}
+
+.releaseinfo {
+	font-style: italic;
+}
+
+.varname, .function {
+	font-weight: bold;
+}
+
+.variablelist dl dt .term .varname {
+	font-weight: normal;
+	font-style: italic;
+}
+
+div.table table {
+	background-color: #b0b0b0;
+	border: 0;
+}
+
+div.table th {
+	background-color: #cccccc;
+	vertical-align: bottom;
+	padding: 2px 6px;
+}
+
+div.table table, div.table thead, div.table tr, div.table td, div.table th {
+	border: 0;
+}
+
+div.table td {
+	padding: 2px 6px;
+	background-color: white;
+}
+
+.list-of-tables {
+	display: none;
+}
+
+@media print {
+	body {
+		font-size: 10pt;
+	}
+
+	a {
+		text-decoration: none;
+	}
+
+	pre.programlisting {
+		background-color: transparent;
+		border: 0;
+		border-left: solid black 4px;
+	}
+
+	.navheader, .navfooter, .list-of-tables {
+		display: none;
+	}
+}

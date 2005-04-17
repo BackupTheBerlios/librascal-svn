@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. "./configure.in"
+
+find_exe "CC" "cc" "gcc" "mingw32-gcc"
+find_exe "RC" "windres"
+find_exe "CPP" "cpp -E"
+find_exe "MDF_GNUPG" "gpg"
+find_exe "MDF_XSLTPROC" "xsltproc"
+find_dir INCDIR "$PREFIX/include"
+find_dir LIBDIR "$PREFIX/lib"
+find_framework FaerionLog
+find_func arc4random
+find_func kqueue
+find_func strlcat
+find_func strlcpy
+find_func res_init resolv -inc "sys/types.h" "netinet/in.h" "resolv.h"
+
+if [ "$MDF_OSNAME" = "NT" ]; then
+  MDF_LIBARCH="nt"
+else
+  MDF_LIBARCH="bsd"
+fi
+
+VERSION_NUM="\"1,0,0,0\""
+out_makefile "Makedefs.faerion.include" "*" "MDF_LIBARCH" "VERSION_NUM"

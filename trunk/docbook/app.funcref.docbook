@@ -1,0 +1,752 @@
+<title>Function reference</title>
+<para>This sections is a complete function reference.  The calling convention for all functions is <type>__rascall</type>, which maps to the one that the authors of the library find most appropriate for a particular platform.</para>
+<para>For C programs <type>bool</type> is <type>int</type>, <constant>false</constant> is 0, <constant>true</constant> is anything other than 0 (no specific value).</para>
+<para>For C++ programs, function parameters marked with &optional; can be omitted, in which case their value will be <constant>NULL</constant>, or zero.  For C programs, this marker must be ignored and all parameters must be specified.</para>
+
+<section id="funcref.standard">
+	<title>Generic functions</title>
+	<para>This section describes functions used by a typical application.</para>
+
+	<section id="rascal_accept">
+		<title>rascal_accept</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_accept(
+	const <link linkend="sock_t">sock_t</link> *,
+	<link linkend="rascal_dispatcher">dispatcher</link>,
+	void *context &optional;
+);</programlisting>
+		<para>Starts accepting incoming connections on the specified address.  The identifier, if valid, can be used in a call to <link linkend="rascal_cancel"><function>rascal_cancel</function></link>.  The <varname>context</varname> value is passed to the <link linkend="rascal_dispatcher">event dispatcher</link> when time comes.  Note that the value of the <varname>context</varname> parameter is inherited by all accepted connections; to identify a particular connection, you need to call <link linkend="rascal_set_context"><function>rascal_set_context</function></link> to change it when the connection is accepted.</para>
+	</section>
+
+	<section id="rascal_accept_service">
+		<title>rascal_accept_service</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_accept_service(
+	const char *name,
+	const char *proto,
+	const char *domain,
+	<link linkend="rascal_dispatcher">dispatcher</link>,
+	void *context &optional;
+);</programlisting>
+		<para>
+			This function begins accepting connections to the specified service.
+			It performs a service descovery DNS query, then attempts to install a listener on all listed addresses.
+		</para>
+		<para>
+			On success, this function installs multiple different listeners; the behaviour of this function can be resembled by a call to <link linkend="rascal_connect_service"><function>rascal_connect_service</function></link> with a filter which calls <link linkend="rascal_accept"><function>rascal_accept</function></link> then declines the outgoing connection attempt.
+		</para>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<varname>name</varname>,
+					<varname>domain</varname>,
+					<varname>proto</varname>
+				</term>
+				<listitem>
+					Service identification information.
+					See <link linkend="rascal_connect_service"><function>rascal_connect_service</function></link>.
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<varname>dispatcher</varname>
+				</term>
+				<listitem>
+					<para>
+						The address of an <link linkend="rascal_dispatcher">event dispatcher</link> function.
+					</para>
+					<para>
+						The <constant>rop_listen</constant> event will be delivered after each particular listener corresponding to the service is installed; the handler may return <constant>false</constant> to cancel a particular listener.
+						The identifiers of listeners must be stored if a need to uninstall them may arise in future; the request identifier returned by <link linkend="rascal_accept_service"><function>rascal_accept_service</function></link> is not suitable for that.
+						Also, all further <constant>rop_accept</constant> notifications will carry the identifier of each particular listener, not the identifier returned by <link linkend="rascal_accept_service"><function>rascal_accept_service</function></link> either.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<varname>context</varname>
+				</term>
+				<listitem>
+					Opaque user data passed back to the specified dispatcher when an event occurs.
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>
+			When the return value <link linkend="rascal_isok">indicates success</link>, which means an operation is being performed in background, it may be used in conjunction with <link linkend="rascal_cancel"><function>rascal_cancel</function></link> to abort installing the listeners.
+			It can not be used to uninstall them later.
+		</para>
+		<formalpara><title>Sample use</title></formalpara>
+		<programlisting>rascal_accept_service("http", "tcp",
+	"faerion.oss", my_dispatcher, NULL);</programlisting>
+	</section>
+
+	<section id="rascal_aton">
+		<title>rascal_aton</title>
+		<programlisting>bool rascal_aton(
+	const char *symbolic,
+	<link linkend="addr_t">addr_t</link> *addr,
+	<link linkend="addr_t">addr_t</link> *mask &optional;
+);</programlisting>
+		<para>Converts an address from its text representation to the numeric form.  The string can be of one of the following forms:</para>
+		<itemizedlist>
+			<listitem>
+				<para>Four octets of an IPv4 address in dotted quad notation.  The <varname>mask</varname> parameter is set to <constant>255.255.255.255</constant>.</para>
+				<programlisting>rascal_aton("127.0.0.1", &amp;addr, NULL);</programlisting>
+			</listitem>
+			<listitem>
+				<para>An IPv4 address and a network mask in dotted quad notation, separated by a slash.</para>
+				<programlisting>rascal_aton("127.0.0.0/255.0.0.0", &amp;addr, &amp;mask);</programlisting>
+			</listitem>
+			<listitem>
+				<para>An IPv4 address and a network range (an integer number of significant higher bits of the address) separated by a slash.</para>
+				<programlisting>rascal_aton("192.168.0.0/16", &amp;addr, &amp;mask);</programlisting>
+			</listitem>
+		</itemizedlist>
+		<para>The mask is ignored if the <varname>mask</varname> parameter is a null pointer or if the pattern does not contain a network mask.</para>
+		<formalpara><title>Return value</title></formalpara>
+		<para>If the address could be interpreted, the function returns REC_SUCCESS and <varname>addr</varname> and <varname>mask</varname> structures receive the corresponding data.  If the <varname>mask</varname> parameter was not specified, the corresponding part of the source string is ignored.</para>
+		<para>When the function fails, the corresponding error message can be retreived by a call to <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link>.  In that case, the content of <varname>addr</varname> and <varname>mask</varname> structures is undetermined.</para>
+	</section>
+
+	<section id="rascal_cancel">
+		<title>rascal_cancel</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_cancel(<link linkend="rrid_t">rrid_t</link>);</programlisting>
+		<para>Cancels a specific request.  A failure is reported using whatever callback mechanism is supported by the request: either a <constant>rop_close</constant> event is delivered, or an address resolution failure is reported.</para>
+	</section>
+
+	<section id="rascal_connect">
+		<title>rascal_connect</title>
+		<para>Starts connectiong to a remote peer.</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_connect(
+	const <link linkend="sock_t">sock_t</link> *target,
+	<link linkend="rascal_dispatcher">dispatcher</link>,
+	void *context &optional;,
+	const char *proto &optional;
+);</programlisting>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist>
+			<varlistentry>
+				<term><varname>target</varname></term>
+				<listitem>
+					<para>The address of the peer that the connection is to be established to.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>dispatcher</varname></term>
+				<listitem>
+					<para>Address of the <link linkend="rascal_dispatcher">event dispatcher</link> for this connection.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>context</varname></term>
+				<listitem>
+					<para>The value that helps the application identify the connection additionally to the request identifier assigned by this function (request identifiers are also persistent and do not change during connection's life time).</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>proto</varname></term>
+				<listitem>
+					<para>Type of the transport protocol that the connection must be established over.  Currently, supported values are <constant>proto_tcp</constant> and <constant>proto_udp</constant>.  With <constant>proto_udp</constant>, the connection will be established immediately (event dispatcher might be called before the function returns), and the application will be able to exchange datagrams with the remote peer.</para>
+					<para>Note: the library does not take responsibility for the reliability of the communication process if the connection is made over <constant>udp</constant>; data may be lost without any notification.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>If the connection was successfully scheduled (see <link linkend="rascal_isok"><function>rascal_isok</function></link>), the return value can be used to interact with the connection, such as by reading or writing data with it.  The connection can also be closed at any time by calling the <link linkend="rascal_cancel"><function>rascal_cancel</function></link> function.</para>
+		<para>When the function fails, a corresponding error message can be retreived using the <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link> function.</para>
+		<formalpara><title>Remarks</title></formalpara>
+		<para>To establish a connection to a target identified by a symbolic host name, you need to either use the <link linkend="rascal_getaddr"><function>rascal_getaddr</function></link> function or, alternatively, use the <link linkend="rascal_connect_service"><function>rascal_connect_service</function></link> function.  To connect to a system the numeric address of which is known, the following code would be sufficient:</para>
+		<programlisting><link linkend="sock_t">sock_t</link> peer(80);
+<link linkend="rascal_aton">rascal_aton</link>("127.0.0.1", &amp;peer.addr, NULL);
+rascal_connect(&amp;peer, NULL, <link linkend="rascal_dispatcher">dispatcher</link>);</programlisting>
+	</section>
+
+	<section id="rascal_connect_service">
+		<title>rascal_connect_service</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_connect_service(
+	const char *name,
+	const char *proto,
+	const char *domain,
+	<link linkend="rascal_dispatcher">dispatcher</link>,
+	void *context &optional;,
+	<link linkend="connfilter">filter</link> &optional;
+);</programlisting>
+		<para>This function attempts to connect to a service trying all available servers.  Behaves similar to <link linkend="rascal_connect"><function>rascal_connect</function></link>.  For more information read about <link linkend="dns"><emphasis>service discovery</emphasis></link>.</para>
+		<variablelist>
+			<varlistentry>
+				<term><varname>service</varname></term>
+				<term><varname>domain</varname></term>
+				<listitem>
+					<para>Service description.  The name of the service, pointed by the <varname>name</varname> parameter, is the application level protocol, such as <emphasis>http</emphasis>, <emphasis>ftp</emphasis>, <emphasis>smtp</emphasis> or other defined by <ulink url="http://www.iana.org/assignments/port-numbers">IANA</ulink> or by common sense.  The value of <varname>domain</varname> is the domain name to look for the service in.</para>
+					<para>For details about service resolution refer to <ulink url="http://www.ietf.org/rfc/rfc2782.txt">RFC2782</ulink>.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>proto</varname></term>
+				<listitem>
+					<para>
+						The type of the transport protocol to establish the connection over.
+						Currently, only "tcp" and "udp" are supported by connection oriented functions.
+					</para>
+					<para>
+						Note: the library does not take responsibility for the reliability of the communication process if the connection is made over <constant>udp</constant>; data may be lost without any notification.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>dispatcher</varname></term>
+				<listitem>
+					<para>The address of an <link linkend="rascal_dispatcher">event dispatcher</link> function.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry id="connfilter">
+				<term><varname>filter</varname></term>
+				<listitem>
+					<para>The address of a function that filters the list of servers that provide the requested service.  If this parameter is <constant>NULL</constant>, all service providers are used.</para>
+					<programlisting>bool __rascall filter(
+	void *context,
+	const char *host,
+	const <link linkend="sock_t">sock_t</link> *addr
+);</programlisting>
+					<para>The function must return <constant>true</constant> to allow the connection attempt to this server or <constant>false</constant> to skip it.</para>
+					<variablelist>
+						<varlistentry>
+							<term><varname>context</varname></term>
+							<listitem>
+								<para>The value passed to <function>rascal_connect_service</function>, unaltered by the library.</para>
+							</listitem>
+						</varlistentry>
+						<varlistentry>
+							<term><varname>host</varname>, <varname>addr</varname></term>
+							<listitem>
+								<para>Host name and numeric address of the server that the library will attemp to connect to, if the filter returns <constant>true</constant>.</para>
+							</listitem>
+						</varlistentry>
+					</variablelist>
+					<para>The library may behave in two ways.  Firstly, it may call the filter function right before it is about to connect to the next server in the list, typically after it failed to reach the previous server in the list.  Or, it can first call the filter for each listed server to remove unwanted servers, and then start connecting.  The application should not depend on each particular behaviour, because it may change.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>If the connection was successfully scheduled (see <link linkend="rascal_isok"><function>rascal_isok</function></link>), the return value can be used to interact with the connection, such as by writing data to or reading from it.  The connection can also be closed at any time by calling the <link linkend="rascal_cancel"><function>rascal_cancel</function></link>.</para>
+		<para>When the function fails, a corresponding error message can be retreived using the <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link> function.</para>
+		<formalpara><title>Sample use</title></formalpara>
+		<programlisting>rascal_connect_service("http", "tcp", "faerion.oss",
+	NULL, <link linkend="rascal_dispatcher">my_dispatcher</link>, NULL);</programlisting>
+	</section>
+
+	<section id="rascal_dispatcher">
+		<title>rascal_dispatcher</title>
+		<para>This function receives notifications about all events raised by a connection established as a result of execution of functions <link linkend="rascal_connect"><function>rascal_connect</function></link>, <link linkend="rascal_connect_service"><function>rascal_connect_service</function></link> or <link linkend="rascal_accept"><function>rascal_accept</function></link>.  The return value is ignored, unless explicitly stated otherwise.</para>
+		<programlisting>bool __rascall rascal_dispatcher(
+	<link linkend="rrid_t">rrid_t</link> conn,
+	const <link linkend="sock_t">sock_t</link> *peer,
+	int event,
+	void *context
+);</programlisting>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist>
+			<varlistentry>
+				<term><varname>conn</varname></term>
+				<listitem>
+					<para>Request identifier.  The application must test this value with the <link linkend="rascal_isok"><function>rascal_isok</function></link> function to see if the operation failed or succeeded.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>peer</varname></term>
+				<listitem>
+					<para>The address of the remote connection endpoint.  If the remote address is not known by the time the event is delivered, this parameter is filled with zeros.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>event</varname></term>
+				<listitem>
+					<para>The type of the event.</para>
+					<table frame="all" class="custom">
+						<title>Event types</title>
+						<tgroup cols="2" align="left">
+							<thead>
+								<row>
+									<entry>Code</entry>
+									<entry>Meaning</entry>
+								</row>
+							</thead>
+							<tbody>
+								<row>
+									<entry id="rop_accept"><constant>rop_accept</constant></entry>
+									<entry>
+										<para>A connection was accepted.  To allow the connection, dispatcher must return <constant>true</constant>; returning <constant>false</constant> will reject the connection.</para>
+										<para>The value of <varname>context</varname> is the one passed to <link linkend="rascal_accept"><function>rascal_accept</function></link>.  To change the context identifier for the established connection, use <link linkend="rascal_set_context"><function>rascal_set_context</function></link>.</para>
+										<para>The <varname>conn</varname> parameter corresponds to the acceepted connection, not to the listening one.</para>
+									</entry>
+								</row>
+								<row>
+									<entry id="rop_close"><constant>rop_close</constant></entry>
+									<entry>
+										<para>The connection is closed.  The <varname>conn</varname> parameter holds the error code.  Conenctions that close gracefully are reported with this parameter set to REC_SUCCESS.</para>
+									</entry>
+								</row>
+								<row>
+									<entry id="rop_connect"><constant>rop_connect</constant></entry>
+									<entry>
+										<para>The connection attempt is finished.  The values of <varname>conn</varname> and <varname>peer</varname> correspond to the established connection.  The value of <varname>context</varname> is the one passed to the connecting function.</para>
+									</entry>
+								</row>
+								<row>
+									<entry id="rop_listen">
+										<constant>rop_listen</constant>
+									</entry>
+									<entry>
+										<para>
+											The library has successfully started accepting incoming connections on the specified address.
+											The handler can still return <constant>false</constant> to cancel doing so.
+										</para>
+									</entry>
+								</row>
+								<row>
+									<entry id="rop_read"><constant>rop_read</constant></entry>
+									<entry>
+										<para>
+											More data is available in the incoming buffer.
+											The full amount of available data can be determined by a call to <link linkend="rascal_get_rq_size"><function>rascal_get_rq_size</function></link>.
+										</para>
+										<para>
+											For stream oriented connections (established over TCP), the frequency of these events is undetermined and can vary from one byte to iseveral kilobytes having been received.
+										</para>
+										<para>
+											For datagram connections (established over UDP), this event is delivered for each received datagram.
+										</para>
+									</entry>
+								</row>
+								<row>
+									<entry id="rop_write"><constant>rop_write</constant></entry>
+									<entry>
+										<para>A portion of data was successfully sent to the connection.</para>
+										<para>For stream oriented connections (established over TCP), the frequency of these events is undetermined and can vary from one byte to the whole buffer having been sent.</para>
+										<para>For datagram connections (established over UDP), this event is delivered for each sent datagram.</para>
+									</entry>
+								</row>
+							</tbody>
+						</tgroup>
+					</table>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>context</varname></term>
+				<listitem>
+					<para>The value passed to <function>rascal_connect</function> or other function that establishes a connection, unaltered by the library.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+
+	<section id="rascal_getaddr">
+		<title>rascal_getaddr</title>
+		<para>Resolves a symbolic host name to a list of numeric addresses (A and AAAA record lookup).</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_getaddr(
+	const char *host,
+	<link linkend="getaddr_callback">callback</link>,
+	void *context &optional;
+);</programlisting>
+		<para>Results are delivered to a callback function of the following prototype:</para>
+		<programlisting id="getaddr_callback">void __rascall callback(
+	void *context,
+	const char *host,
+	unsigned int count,
+	const <link linkend="addr_t">addr_t</link> *addrs
+);</programlisting>
+		<para>If the value of <varname>count</varname> is zero, the lookup has failed, otherwise <varname>addrs</varname> points to an array of numeric addresses associated with the requested host name.</para>
+		<formalpara><title>Return value</title></formalpara>
+		<para>If the request could not be scheduled, the corresponding error message can be retreived using the <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link>.  Otherwise, the return value can be used to cancel the request by a call to <link linkend="rascal_cancel"><function>rascal_cancel</function></link>; in that case, the callback function will be called by the library, with <varname>count</varname> set to zero.</para>
+	</section>
+
+	<section id="rascal_gethost">
+		<title>rascal_gethost</title>
+		<para>Resolves the numeric address to a list of symbolic host names (PTR record lookup).</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_gethost(
+	const <link linkend="sock_t">sock_t</link> *addr,
+	<link linkend="gethost_callback">callback</link>,
+	void *context &optional;
+);</programlisting>
+		<para>Results are delivered to a callback function of the following prototype:</para>
+		<programlisting id="gethost_callback">void __rascall callback(
+	void *context,
+	const <link linkend="sock_t">sock_t</link> *addr,
+	unsigned int count,
+	const char **hosts
+);</programlisting>
+		<para>If the value of <varname>count</varname> is zero, then the lookup has failed, otherwise <varname>hosts</varname> points to an array of pointers to null-terminated host names associated with the requested address.</para>
+		<formalpara><title>Return value</title></formalpara>
+		<para>If the request could not be processed, the corresponding error message can be retreived using the <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link>.  Otherwise, the return value can be used to cancel the request by a call to <link linkend="rascal_cancel"><function>rascal_cancel</function></link>; in that case, the callback function will be called by the library, having the <varname>count</varname> parameter set to zero.</para>
+	</section>
+
+	<section id="rascal_get_rq_size">
+		<title>rascal_get_rq_size</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_get_rq_size(
+	<link linkend="rrid_t">rrid_t</link>,
+	unsigned int *size
+);</programlisting>
+		<para>Use this to get the number of bytes in a connection's incoming buffer.  If the function succeeds, <varname>size</varname> is updated with the size of the buffer.  Note that for a datagram connection, size of all datagrams is returned, even though <link linkend="rascal_read"><function>rascal_read</function></link> will only return one datagram with each call.</para>
+	</section>
+
+	<section id="rascal_get_sq_size">
+		<title>rascal_get_sq_size</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_get_sq_size(
+	<link linkend="rrid_t">rrid_t</link>,
+	unsigned int *size
+);</programlisting>
+		<para>Use this to get the number of bytes in a connection's outgoing buffer.  If the function succeeds, <varname>size</varname> is updated with the size of the queue.</para>
+	</section>
+
+	<section id="rascal_get_errmsg">
+		<title>rascal_get_errmsg</title>
+		<programlisting>viod rascal_get_errmsg(
+	<link linkend="rrid_t">rrid_t</link>,
+	char *buffer,
+	unsigned int buffer_size
+);</programlisting>
+		<para>This function can be used to retreive a human readable error descriptions.  The <link linkend="rrid_t"><type>rrid_t</type></link> parameter is the error code.  <varname>Buffer</varname> and <varname>buffer_size</varname> define the location that receives the error description as a null-terminated string.  If the buffer is not large enough, the message will be truncated.</para>
+		<para>Sample use:</para>
+		<programlisting>if (!<link linkend="rascal_isok">rascal_isok</link>(rascal_do_something())) {
+	char message[1024];
+	rascal_get_errmsg(rid, message, sizeof(message));
+	printf("Error: %s\n", message);
+}</programlisting>
+		<para>The messages are returned using the system default language, usually U.S. English.</para>
+	</section>
+
+	<section id="rascal_init">
+		<title>rascal_init</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_init(unsigned int policy);</programlisting>
+		<para>This function initializes the library.  Typically, it creates working threads and several threads for library's internal purposes.  If initialization fails, the application should stop interacting with the library; all attempts to call functions that perform asynchronous actions will fail.</para>
+		<para>There is no function to shut the library down; this only happens when the process ceases.</para>
+		<para>The <varname>policy</varname> parameter defines the behaviour of the library and can be one of the following:</para>
+		<itemizedlist>
+			<listitem>
+				<para><constant>RIP_WORKER_MANUAL</constant></para>
+				<para>Tells the library not to spawn worker threads.  The application must periodically call <link linkend="rascal_work"><function>rascal_work</function></link> to perform all outstanding tasks and dispatch events.  This mode is useful for applications that have a running loop and want everything – both the non-library code and event dispatching – happen within a single thread.</para>
+			</listitem>
+			<listitem>
+				<para><constant>RIP_WORKER_SINGLE</constant></para>
+				<para>Tells the library to create a single worker thread that dispatches events "in the background".  This mode is useful for applications that serve a GUI in the main thread, such as applications written with <ulink url="http://msdn.microsoft.com/visualc/">MFC</ulink> or other libraries, and the developer does not want to hack into the main program loop to call <link linkend="rascal_work"><function>rascal_work</function></link> from there.</para>
+				<para>This is the recommended mode of execution for most GUI applications and applications that don't fight for best performance.</para>
+			</listitem>
+			<listitem>
+				<para><constant>RIP_WORKER_PER_CPU</constant></para>
+				<para>Tells the library to launch as many worker threads as there are CPUs installed.  On systems that support it, affinity masks are set so that each thread runs on a different CPU.  This mode is best for high-performance applications.</para>
+			</listitem>
+		</itemizedlist>
+		<para>In a multithreaded environment the application must use its own means to protect the data from being accessed simultaenously by multiple threads.</para>
+	</section>
+
+	<section id="rascal_isok">
+		<title>rascal_isok</title>
+		<para>Checks if the result identifier indicates an error.</para>
+		<programlisting>bool rascal_isok(<link linkend="rrid_t">rrid_t</link> id);</programlisting>
+		<para>This function returns <constant>true</constant> if the operation identified by <varname>id</varname> has been executed without errors.  If <constant>false</constant> is returned, <varname>id</varname> can be fed to the <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link> function to retreive the corresponding error message.</para>
+	</section>
+
+	<section id="rascal_ntoa">
+		<title>rascal_ntoa</title>
+		<programlisting>void rascal_ntoa(
+	const <link linkend="addr_t">addr_t</link> *source,
+	char *buffer,
+	unsigned int buffer_size
+);</programlisting>
+		<para>Fills the buffer with a null-terminated string that represents the given address in a text form in the most common representation.</para>
+	</section>
+
+	<section id="rascal_read">
+		<title>rascal_read</title>
+		<para>This function retreives data from the connection's incoming buffer.</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_read(
+	<link linkend="rrid_t">rrid_t</link> conn,
+	void *buffer,
+	unsigned int *buffer_size
+);</programlisting>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist>
+			<varlistentry>
+				<term><varname>conn</varname></term>
+				<listitem>
+					<para>Handle of the connection that the data must be retreived from.  If the handle does not correspond to a valid data oriented connection, an error is reported.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>buffer</varname></term>
+				<term><varname>buffer_size</varname></term>
+				<listitem>
+					<para>Location and dimension of the buffer that receives the data.  Before calling the function, <varname>buffer_size</varname> must be set to the size of the buffer, in bytes.  When the function returns with success, <varname>buffer_size</varname> is updated with the number of bytes actually retreived; this value never exceeds the original buffer size.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>On success, the function returns <constant>REC_SUCCESS</constant>, otherwise an error code is returned.  Error code REC_NO_DATA means that the buffer was empty and to data could be retreived (whether this is  an error or not is up to the application).</para>
+		<formalpara><title>Remarks</title></formalpara>
+		<para>When reading from a stream-oriented connection, the whole incoming buffer can be retreived with one call.  If <varname>conn</varname> corresponds to a datagram connection, only one full datagram will be retreived with each call, no matter how large the buffer is.  When no more datagrams are available, the function returns <constant>REC_NO_DATA</constant>.</para>
+	</section>
+
+	<section id="rascal_reads">
+		<title>rascal_reads</title>
+		<para>This function retreives a line of text from the connection's incoming buffer.  A line of text is a sequence of 8-bit characters terminated by an LF character.</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_reads(
+	<link linkend="rrid_t">rrid_t</link> conn,
+	char *buffer,
+	unsigned int *buffer_size,
+	int flags &optional;
+);</programlisting>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist class="parameters">
+			<varlistentry>
+				<term><varname>conn</varname></term>
+				<listitem>
+					<para>Handle of the connection that the data must be retreived from.  If the handle does not correspond to a valid stream oriented connection, an error is reported.  This function can not be used on datagram connections.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>buffer</varname></term>
+				<term><varname>buffer_size</varname></term>
+				<listitem>
+					<para>Location and dimension of the buffer that receives the a NUL-terminated C-string.  On success, <varname>buffer_size</varname> is updated with the number of actually copied bytes, excluding the (trailing) NUL character.  (That is, the maximum possible value of <varname>buffer_size</varname> on return is the initial value minus one.)</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>flags</varname></term>
+				<listitem>
+					<para>A bit mask that modifies the behaviour of the function.  By default (when zero is used for <varname>flags</varname>), the function does the following:</para>
+					<orderedlist>
+						<listitem>Copies the data to the specified destination, excluding all trailing CR and LF characters.  If the destination is not large enough, the data is truncated.</listitem>
+						<listitem>Removes the data from the connection's incoming buffer, up to and including the LF character.</listitem>
+					</orderedlist>
+					<para>A combination of the following flags can be used to modify this behaviour:</para>
+					<table frame="all" class="custom">
+						<title>rascal_reads flags</title>
+						<tgroup cols="2" align="left">
+							<thead>
+								<row>
+									<entry>Value</entry>
+									<entry>Meaning</entry>
+								</row>
+							</thead>
+							<tbody>
+								<row>
+									<entry><constant>RRF_UNTRIMMED</constant></entry>
+									<entry>Tells the function to include trailing CR and LF characters in the destination buffer.</entry>
+								</row>
+								<row>
+									<entry><constant>RRF_PEEK</constant></entry>
+									<entry>Prevents the function from removing the data from the connection's incoming buffer; the data is copied to the specified destination and remains in the buffer.</entry>
+								</row>
+								<row>
+									<entry><constant>RRF_MEASURE</constant></entry>
+									<entry>Prevents the function from extracting anything; instead, <varname>size</varname> is updated with the length of the buffer that would be enough to receive the whole string, without truncation.  Other flags that modify the copied string (such as <constant>RRF_UNTRIMMED</constant>) are taken into consideration.</entry>
+								</row>
+							</tbody>
+						</tgroup>
+					</table>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>If everything goes well, the function returns <constant>REC_SUCCESS</constant>.  If the connection's incoming buffer did not contain an LF character, the function returns <constant>REC_NO_DATA</constant>.  Descriptions of other error messages can be retreived using <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link>.</para>
+		<formalpara><title>Example</title></formalpara>
+		<programlisting>char buffer[1024];
+unsigned int size = sizeof(buffer);
+
+while (rascal_isok(rascal_reads(rid, buffer, &amp;size))) {
+	printf(">> %s\n", buffer);
+	size = sizeof(buffer);
+}</programlisting>
+	</section>
+
+	<section id="rascal_set_context">
+		<title>rascal_set_context</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_set_context(
+	<link linkend="rrid_t">rrid_t</link>,
+	void *context
+);</programlisting>
+		<para>Modifies the context identifier for a connection.  If <varname>conn</varname> does not correspond to a data oriented connection, an error is reported.</para>
+	</section>
+
+	<section id="rascal_wait">
+		<title>rascal_wait</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rasacl_wait(<link linkend="rrid_t">rrid_t</link> id);</programlisting>
+		<para>Suspends the current thread until the request with the specified <varname>id</varname> is finished, either successfully or with an error.  This function is for applications that do not need to work asynchronously (such as simple command line utilities); it lets avoid using semaphores and other signalisation.</para>
+	</section>
+
+	<section id="rascal_work">
+		<title>rascal_work</title>
+		<programlisting>bool rascal_work(unsigned int msec);</programlisting>
+		<para>Lets the library perform pending operations and dispatch the events.  The library will spend <varname>msec</varname> milliseconds waiting for an operation to complete and then return without doing anything.  If there was job to do, the library will most likely to return before the specified amount of time has elapsed.</para>
+		<para>Using this function makes sense only if the library was started in the <link linkend="rascal_init"><constant>RIP_WORKER_MANUAL</constant></link> mode; in all other modes the library already has at least one worker thread that calls this function in an infinite loop.</para>
+		<formalpara><title>Return value</title></formalpara>
+		<para>The function returns <constant>true</constant> if there were events dispatched, <constant>false</constant> if nothing was done.</para>
+	</section>
+
+	<section id="rascal_write">
+		<title>rascal_write</title>
+		<para>Writes data to a connection.</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_write(
+	<link linkend="rrid_t">rrid_t</link> conn,
+	const char *buffer,
+	unsigned int buffer_size
+);</programlisting>
+		<variablelist>
+			<varlistentry>
+				<term><varname>conn</varname></term>
+				<listitem>
+					<para>Identifier of the connection that the data must be retreived from.  If the handle does not correspond to a valid data oriented connection, an error is reported.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>buffer</varname></term>
+				<term><varname>buffer_size</varname></term>
+				<listitem>
+					<para>Location and size of the block of data must be sent.  The function copies the data to the connection's internal buffer, thus <varname>buffer</varname> may point to stack-based data.</para>
+					<para>For datagram connections, one call to <function>rascal_write</function> adds one datagram to the outgoing buffer.  The library truncates datagrams to 2048 bytes; the underlying transport provider may truncate it to an even smaller size.  The common size limit for a datagram is 512 bytes.</para>
+					<para>For stream oriented connections, there is no limit on the size of the data.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>On success, the function returns REC_SUCCESS.  Otherwise, the corresponding error message can be retreived with <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link>.  If the function fails, it does not necessarily mean that the connection is no longer usable; instead, the application should wait for a <constant>rop_close</constant> event to prove that.</para>
+	</section>
+</section>
+
+
+<section id="funcref.advanced">
+	<title>Advanced functions</title>
+	<para>This section describes advanced functions.</para>
+
+	<section id="rascal_get_option">
+		<title>rascal_get_option</title>
+		<para>This function retreives values of options that control various aspects of the library's internal functioning.</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_get_option(
+	unsigned int optid,
+	long int *value
+);</programlisting>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist>
+			<varlistentry>
+				<term><varname>optid</varname></term>
+				<listitem>
+					<para>Identifies the option that the application wants to retrieve the value of.  For a list of available options, refer to the <link linkend="rascal_set_option"><function>rascal_set_option</function></link> function description.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>value</varname></term>
+				<listitem>
+					<para>If not null, receives the current value of the option.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>On success, the function returns <constant>REC_SUCCESS</constant>.  Otherwise, an error code is returned which can then be used in a call to <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link>.</para>
+	</section>
+
+	<section id="rascal_set_dispatcher">
+		<title>rascal_set_dispatcher</title>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_set_dispatcher(
+	<link linkend="rrid_t">rrid_t</link>,
+	<link linkend="rascal_dispatcher">rascal_dispatcher</link> new_dispatcher
+);</programlisting>
+		<para>Changes the address of the dispatcher function for a request.</para>
+	</section>
+
+	<section id="rascal_set_nameserver">
+		<title>rascal_set_nameserver</title>
+		<programlisting>void rascal_set_nameserver(
+	const <link linkend="sock_t">sock_t</link> *list,
+	unsigned int count
+);</programlisting>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist>
+			<varlistentry>
+				<term><varname>list</varname></term>
+				<term><varname>count</varname></term>
+				<listitem>
+					<para>The array of addresses of name servers to be used.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Remarks</title></formalpara>
+		<para>This function opens connections to a number of name servers.  When more than one server is specified; each query is sent to all servers, the first response is used.  This is usually used as a measure against DNS server failure.  Currently, the library supports up to 16 name servers.</para>
+		<para>The library connects to all name servers defined in the system configuration during start-up; you don't need to use this function unless you want to access non-default name servers.  (For example, when you want to use <ulink url="http://www.opennic.unrated.net">OpenNIC</ulink> on systems that you can not reconfigure.)</para>
+	</section>
+
+	<section id="rascal_set_option">
+		<title>rascal_set_option</title>
+		<para>
+			This function can be used for fine-tuning the library.
+			Fine-tuning is done by changing so-called "options", each of which is has a 32-bit signed integer value assigned to it.
+		</para>
+		<programlisting><link linkend="rrid_t">rrid_t</link> rascal_set_option(
+	unsigned int optid,
+	long int value,
+	long int *old_value &optional;
+);</programlisting>
+		<formalpara><title>Parameters</title></formalpara>
+		<variablelist>
+			<varlistentry>
+				<term><varname>optid</varname></term>
+				<listitem>
+					<para>Identifies the option that the application wants changed.  Possible options are:</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								<constant>RO_VOID</constant> – no meaning, holds a user-defined 32-bit value.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<constant>RO_DNS_TIMEOUT</constant> – the number of milliseconds for a DNS query to remain unanswered before being resent.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<constant>RO_DNS_RETRY</constant> – the number of times an unanswered DNS query is resent before a failure is reported.
+								Setting this to zero will disable retries, having the queries only sent once.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<constant>RO_THREAD_POLICY</constant> – threading policy used by the library.
+								The value can only be set once and is set by the <link linkend="rascal_init"><function>rascal_init</function></link> function.
+								Once the option is set, it becomes read-only.
+								If you change this option before initializing the library with a call to <link linkend="rascal_init"><function>rascal_init</function></link>, the library will fail to initialize and normal execution will not be possible.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<constant>RO_CONN_TIMEOUT</constant> — outgoing connection timeout, in seconds.
+								Connection attempts that do not finish during the specified time period will fail with <constant>REC_CONN_TIMEOUT</constant>.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>value</varname></term>
+				<listitem>
+					<para>The new value for the option.  The library performs no sanity check of the values.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term><varname>old_value</varname></term>
+				<listitem>
+					<para>If not null, receives the old value of the option.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara><title>Return value</title></formalpara>
+		<para>On success, the function returns <constant>REC_SUCCESS</constant>.  If the option can not be changed, <constant>REC_OPTION_READONLY</constant> is returned.  Otherwise, an error code is returned which can then be used in a call to <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link>.</para>
+		<formalpara><title>Remarks</title></formalpara>
+		<para>The options are process-wide.  The changes are immediately visible to all threads.</para>
+	</section>
+
+	<section id="rascal_shrink">
+		<title>rascal_shrink</title>
+		<programlisting>void rascal_shrink(void);</programlisting>
+		<para>Releases all internally cached resources that are currently not being used.  This function should not be called often, because that would cause performance penalty: the memory pool is constantly reused without the implication of memory allocation functions which saves time on thread safety (memory heap locking) and so on.</para>
+	</section>
+</section>

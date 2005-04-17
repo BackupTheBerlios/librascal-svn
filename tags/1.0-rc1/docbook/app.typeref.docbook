@@ -1,0 +1,41 @@
+<title>Type reference</title>
+<para>This section documents all data types and structures used by the library.  For C programs, each structure has a corresponding typedef with the same name.</para>
+
+<section id="addr_t">
+	<title>addr_t</title>
+	<para>This is an opaque structure used to describe an internet address.</para>
+	<programlisting>struct addr_t {
+	unsigned int length;
+	unsighed char data[16];
+};</programlisting>
+	<para>The application has no way of learning the type of the address other than guessing it by the value of the <varname>length</varname> member.  Typically, the value is 4 for an IPv4 address and 16 for an IPv6 address.  Other address families are currently not supported.</para>
+	<para>To convert an address to a human-readable string, the application can use the <link linkend="rascal_ntoa"><function>rascal_ntoa</function></link> function; to convert a string to an <type>addr_t</type> structure, the <link linkend="rascal_aton"><function>rascal_aton</function></link> function should be used.  Otherwise, the application can work with address descriptors on the octet level, by accessing the <varname>data</varname> array.</para>
+	<para>The following additional methods are available in C++ mode:</para>
+	<programlisting>// Constructors:
+addr_t(unsigned int length = 0);
+addr_t(const addr_t &amp;src);
+// Operators:
+addr_t&amp; operator = (const addr_t &amp;src);</programlisting>
+</section>
+
+<section id="sock_t">
+	<title>sock_t</title>
+	<para>This structure extends the opaque address descriptor <link linkend="addr_t"><type>addr_t</type></link> with a port number:</para>
+	<programlisting>struct sock_t {
+	struct <link linkend="addr_t">addr_t</link> addr;
+	unsigned short port;
+};</programlisting>
+	<para>The following additional methods are available in C++ mode:</para>
+	<programlisting>// Constructors:
+sock_t(unsigned short _port = 0);
+sock_t(const sock_t &amp;src);
+sock_t(addr_t &amp;src, unsigned short _port);
+// Operators:
+operator sock_t* ();</programlisting>
+</section>
+
+<section id="rrid_t">
+	<title>rrid_t</title>
+	<para>This type is used as a request identifier.  It also serves as a success indicator; the value can be tested using the <link linkend="rascal_isok"><function>rascal_isok</function></link> function to see if the requested operation was successfully scheduled or performed.  If the result is negative, then the corresponding error description can be retrieved using the <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link> function.</para>
+	<para>Request identifiers can be used to cancel a request that was scheduled for background execution.  However, not every operation can be cancelled; an example of one that can't be is <link linkend="rascal_write"><function>rascal_write</function></link>.  Typically, a manifest constant <constant>REC_SUCCESS</constant> is returned when the request was successfully scheduled but can not be cancelled.</para>
+</section>

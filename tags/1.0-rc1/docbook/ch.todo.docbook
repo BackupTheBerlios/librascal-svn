@@ -1,0 +1,14 @@
+<!--
+<chapter id="todo">
+	<title>Pending changes</title>
+	<para>This chapter describes the implementation and design details that need to be reviewed and/or changed.  Discussion on this topic is welcome at <email>&contactemail;</email> (subscribe yourself by sending an email to majordomo@ with "subscribe ircd" in the body).</para>
+	<itemizedlist>
+		<listitem><para><emphasis>Reading into the specified memory area</emphasis>, to avoid copying large amounts of data.  Transferring big binary objects will benefit from this.</para></listitem>
+		<listitem><para><emphasis>Writing from the specified memory area</emphasis> would also be needed, obviously.</para></listitem>
+		<listitem><para><emphasis>Design recommendations</emphasis> might be a good section for the documentation.  Namely, things like chosing a threading model would be described there.  Also, it would note whether MFC, VCL and other popular libraries go into alertable state when saving time while waiting for an event to occur; if they do, it would mean that the whole asynchronous application can be built within just one thread.</para></listitem>
+		<listitem><para>A research on the overhead of frequently calling <ulink url="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/base/readfileex.asp"><function>ReadFileEx</function></ulink> frequently with small data blocks vs. calling it less frequently with larger data blocks.  Nihil would mean that <function>rascal_read</function> would just call <function>rascal_read_ex</function> and maintain an internal buffer.</para></listitem>
+		<listitem><para>Declare functions for transparent data flow compression.</para></listitem>
+		<listitem><para>The return value of a successfull call to <link linkend="rascal_read"><function>rascal_read</function></link> and related functions should be <emphasis>zero</emphasis>.  Passing zero to <link linkend="rascal_cancel"><function>rascal_cancel</function></link> must result in an "invalid handle" error.</para></listitem>
+	</itemizedlist>
+</chapter>
+-->

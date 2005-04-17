@@ -1,0 +1,26 @@
+This document describes the current implementation status (thigs
+left to do, actually).
+
+Documentation:
+
+  - Clarify whether the dispatcher is called for a connection
+    request that failed immediately (probably this should not
+    happen if the request haven't been scheduled).
+
+DNS Resolver:
+
+  - Introduce an error code for malformed host names (ones that
+    contain more than one dot in a row).
+
+  - Compare the stored request with the request section in the
+    response packet before parsing it.
+
+  - Implement a way to specify an alternative domain name for
+    numeric address resolution (instead of "in-addr.arpa").
+    Perhaps a version of rascal_gethost() that accepts a host
+    name and performs PTR RR resolution would be enough.
+
+Generic:
+
+  - Analyze all interlocked code and the possibility to replace
+    per-connection mutexes with one static spinlock.
