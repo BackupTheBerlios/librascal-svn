@@ -283,6 +283,7 @@ find_func()
   $comp > $MDF_TEMPE 2>&1
   if [ "$?" = "0" ]; then
     DEFS="$DEFS HAVE_$func"
+		eval HAVE_$func="yes"
     echo " found!"
     echo "find_func: funciton $func found." >> configure.log
   else
@@ -343,8 +344,9 @@ find_framework()
     for i in /Library/Frameworks; do
       if [ -d $i/$1.framework/Headers ]; then
         INCDIR="$INCDIR $i/$1.framework/Headers"
-	DEFS="$DEFS HAVE_$1"
-	break
+				DEFS="$DEFS HAVE_$1"
+				eval HAVE_$1="yes"
+				break
       fi
     done
   else
