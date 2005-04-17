@@ -7,7 +7,7 @@
 // This file contains all hostname-to-numeric resolution code.
 
 #include <string.h>
-#include <faeutil/faeutil.h>
+// #include "../util/faeutil.h"
 #include "resolver.h"
 #include "../debug.h"
 
@@ -29,7 +29,7 @@ void getaddr::on_event(header &hdr, const char *src, unsigned int size)
 	addr_t addrs[16];
 	unsigned int count;
 
-	debug((flog, rl_resolver, "* getaddr event, request lifetime: %u msec.\n", (faeutil::timespec() - tstamp).mseconds()));
+	debug((flog, rl_resolver, "* getaddr event, request lifetime: %u msec.\n", (ftspec() - tstamp).mseconds()));
 
 	count = hdr.get_addrs(src, size, addrs, sizeof(addrs) / sizeof(addrs[0]));
 

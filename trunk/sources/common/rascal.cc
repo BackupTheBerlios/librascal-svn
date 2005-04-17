@@ -10,7 +10,7 @@
 # include <netinet/in.h>
 #endif
 
-#include "rascal.h"
+#include "common.h"
 
 // The purpose of this function is to ensure that all symbols
 // that need to be exported are referenced.  This makes linker

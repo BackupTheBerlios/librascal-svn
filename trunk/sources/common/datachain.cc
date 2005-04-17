@@ -9,7 +9,7 @@
 // operations are performed from the header class to save time on
 // function calls.
 
-#include "rascal.h"
+#include "common.h"
 #include "datachain.h"
 
 // Little helper function.

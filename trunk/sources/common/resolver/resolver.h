@@ -7,8 +7,8 @@
 #ifndef __rascal_resolver_h
 #define __rascal_resolver_h
 
-#include <faeutil/time.h>
-#include "../rascal.h"
+#include "../util/ftspec.h"
+#include "../common.h"
 #include "../object.h"
 
 #define NAMESERVER_COUNT 16
@@ -126,12 +126,12 @@ class request : public object
 {
 protected:
 	DECLARE_ALLOCATOR;
-	static faeutil::mutex mx; // chain locker
+	static mutex mx; // chain locker
 	static request *queue; // chain head
 	static unsigned short lastid; // last request id
 protected:
 	request *next; // chain linker
-	faeutil::timespec tstamp; // request creation time
+	ftspec tstamp; // request creation time
 	unsigned int rcount; // repeat count
 	unsigned short id;
 	void *context;

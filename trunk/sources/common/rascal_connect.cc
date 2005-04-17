@@ -5,7 +5,7 @@
 // $Id$
 
 #include <errno.h>
-#include "rascal.h"
+#include "common.h"
 #include "debug.h"
 
 rrid_t rascal_connect(const sock_t *target, rascal_dispatcher disp, void *context, const char *proto)

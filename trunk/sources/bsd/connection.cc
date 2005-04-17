@@ -18,8 +18,6 @@
 #include "../common/datachain.h"
 #include "../common/debug.h"
 
-using namespace faeutil;
-
 IMPLEMENT_ALLOCATORS(connection);
 
 static int makesock(int mode)
@@ -114,7 +112,7 @@ void connection::on_error(int psec)
 void connection::on_pulse()
 {
 	long int limit;
-	faeutil::timespec now;
+	ftspec now;
 
 	if (mode != cm_connect)
 		return;

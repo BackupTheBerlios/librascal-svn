@@ -4,7 +4,7 @@
 //
 // $Id$
 
-#include "rascal.h"
+#include "common.h"
 #include "datachain.h"
 
 bool packetchain::append(const char *src, unsigned int size)

@@ -7,6 +7,9 @@
 // This file implements the DNS monitor, a thread that resends queries that
 // haven't been replied in a certain period of time.
 
+#if defined(HAVE_configure_h)
+# include "../../../configure.h"
+#endif
 #include <errno.h>
 #include <stdlib.h>
 #ifdef _DEBUG
@@ -17,19 +20,17 @@
 #else
 # include <unistd.h>
 #endif
-#include <faeutil/sem.h>
-#include <faeutil/time.h>
+#include "../util/sem.h"
+#include "../util/ftspec.h"
 #include "resolver.h"
 #include "../debug.h"
-
-using namespace faeutil;
 
 static sem msem;
 
 bool request::cycle_monitor(request *queue)
 {
 	bool rc = false;
-	faeutil::timespec until(0), now(0);
+	ftspec until(0), now(0);
 	long int timeout, repeat;
 
 	now.update();
@@ -41,7 +42,7 @@ bool request::cycle_monitor(request *queue)
 	mx.enter();
 
 	for (request **tail = &queue, **next; *tail != NULL; tail = next) {
-		faeutil::timespec now;
+		ftspec now;
 		request *item = *tail;
 
 		next = &(*tail)->next;
@@ -54,7 +55,7 @@ bool request::cycle_monitor(request *queue)
 		now.update();
 
 		// Calculate the request's current TTL.
-		faeutil::timespec ttl = item->tstamp + item->rcount * timeout;
+		ftspec ttl = item->tstamp + item->rcount * timeout;
 
 		// Expired, need to resend.
 		if (now > ttl) {

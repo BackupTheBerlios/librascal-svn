@@ -4,7 +4,7 @@
 //
 // $Id$
 
-#include "rascal.h"
+#include "common.h"
 
 
 static const char *octets[256] =

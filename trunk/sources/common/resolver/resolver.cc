@@ -7,6 +7,7 @@
 #include <errno.h>
 #include "resolver.h"
 #include "../debug.h"
+#include "../util/random.h"
 
 // Addresses of nameservers.
 sock_t ns_addr[NAMESERVER_COUNT];

@@ -4,11 +4,9 @@
 //
 // $Id$
 
-#include <faeutil/faeutil.h>
+// #include "../util/faeutil.h"
 #include "resolver.h"
 #include "../debug.h"
-
-using namespace faeutil;
 
 IMPLEMENT_ALLOCATORS(request);
 

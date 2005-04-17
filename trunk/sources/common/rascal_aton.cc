@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include "rascal.h"
+#include "common.h"
 #include "debug.h"
 
 static bool getseg(const char *&src, unsigned int &seg)

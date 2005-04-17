@@ -5,7 +5,7 @@
 // $Id$
 
 #include <string.h>
-#include <faeutil/faeutil.h>
+#include "../util/random.h"
 #include "resolver.h"
 #include "../debug.h"
 

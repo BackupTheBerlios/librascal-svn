@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "rascal.h"
+#include "common.h"
 
 typedef struct rmsg {
 	int id;

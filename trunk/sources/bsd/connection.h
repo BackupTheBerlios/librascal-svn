@@ -7,9 +7,9 @@
 #ifndef __rascal_bsd_connection_h
 #define __rascal_bsd_connection_h
 
-#include <faeutil/time.h>
 #include "../common/object.h"
-#include "../common/rascal.h"
+#include "../common/common.h"
+#include "../common/util/ftspec.h"
 
 class datachain;
 
@@ -23,9 +23,9 @@ protected:
 	void *context; // user data
 	bool selected; // in select()
 	// The time when the connection was initiated.
-	faeutil::timespec ts;
+	ftspec ts;
 	// Thread safety.
-	faeutil::mutex mx;
+	mutex mx;
 	// Filter for connection selector.
 	static bool filter(object *, void *);
 	// Checks whether the outgoing queue is not empty.

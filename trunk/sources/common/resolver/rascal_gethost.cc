@@ -26,7 +26,7 @@ void gethost::on_event(header &hdr, const char *src, unsigned int size)
 	const char *hostv[16];
 	unsigned int count;
 
-	debug((flog, rl_resolver, "* gethost event, request lifetime: %u msec.\n", (faeutil::timespec() - tstamp).mseconds()));
+	debug((flog, rl_resolver, "* gethost event, request lifetime: %u msec.\n", (ftspec() - tstamp).mseconds()));
 
 	count = hdr.get_hosts(src, size, hosts, dimof(hosts));
 

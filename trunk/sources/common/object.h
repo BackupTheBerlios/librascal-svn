@@ -84,9 +84,9 @@
 #ifndef __rascal_object_h
 #define __rascal_object_h
 
-#include <faeutil/mutex.h>
-#include <faeutil/sem.h>
-#include "../rascal.h"
+#include "util/mutex.h"
+#include "util/sem.h"
+#include "rascal.h"
 
 #define DECLARE_CLASSID(name) \
 	static ot_t get_class_ot(void) { static ot_t _t = "ot_" #name; return _t; } \
@@ -110,7 +110,7 @@ private:
 	// Object identifier, assigned on creation.
 	rrid_t id;
 	// Object guard.
-	faeutil::mutex mx;
+	mutex mx;
 protected:
 	// Increments the reference counter.
 	void incref();

@@ -6,12 +6,9 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <faeutil/stock.h>
-#include <faeutil/sem.h>
 #include "object.h"
 #include "debug.h"
-
-using namespace faeutil;
+#include "util/stock.h"
 
 // The main list of objects that maintains IDs.  I don't want to make
 // it a static class member (which it's ought to be) to avoid inclusion

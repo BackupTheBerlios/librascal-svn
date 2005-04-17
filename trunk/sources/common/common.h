@@ -7,6 +7,10 @@
 #ifndef __common_rascal_h
 #define __common_rascal_h
 
+#if defined(HAVE_configure_h)
+# include "../../configure.h"
+#endif
+
 #if defined(_WIN32)
 # include <windows.h>
 # include <winsock2.h>
@@ -14,9 +18,9 @@
 # include <sys/types.h>
 # include <sys/socket.h>
 #endif
-#include <faeutil/mutex.h>
-#include <faeutil/memory.h>
-#include "../rascal.h"
+#include "util/mutex.h"
+#include "util/memory.h"
+#include "rascal.h"
 #if defined(HAVE_libdmalloc) && defined(_DEBUG)
 # include <dmalloc.h>
 #endif
@@ -30,6 +34,8 @@
 #else
 # define ATTRIBUTE_UNUSED
 #endif
+
+#include "../rascal.h"
 
 #ifdef _WIN32
 # define GetSysError (REC_SYSERROR_MASK | GetLastError())

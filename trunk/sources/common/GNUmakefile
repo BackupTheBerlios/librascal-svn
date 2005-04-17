@@ -3,9 +3,9 @@
 
 include ../../Makedefs.faerion.include
 
-TARGET = library.static
-PROG   = rascal.a
-SRCS   = $(wildcard *.cc resolver/*.cc)
-DEFS  += BUILD_RASCAL RASCAL_HELPERS
+TARGET  = library.static
+PROG    = rascal.a
+SRCS    = $(wildcard util/*.cc *.cc resolver/*.cc)
+DEFS   += BUILD_RASCAL RASCAL_HELPERS
 
 include ../../Makedefs.faerion
