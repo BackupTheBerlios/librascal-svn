@@ -1,4 +1,5 @@
 #!/bin/sh
+# vim:ts=2:sts=2:sw=2:noet
 
 . "./configure.in"
 if [ -f "$HOME/.makedefs" ]; then . "$HOME/.makedefs"; fi
@@ -10,7 +11,7 @@ find_exe "MDF_GNUPG" "gpg"
 find_exe "MDF_XSLTPROC" "xsltproc"
 find_dir INCDIR "$PREFIX/include"
 find_dir LIBDIR "$PREFIX/lib"
-find_framework FaerionLog
+find_framework FaerionLog || find_lib flog
 if [ "$MF_DMALLOC" = "1" ]; then
 	find_lib dmallocthcxx
 fi
