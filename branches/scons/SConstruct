@@ -225,5 +225,5 @@ lib = env.SharedLibrary(output_dir + '/rascal', libsrc, CCFLAGS = '-DBUILD_RASCA
 # Build the samples.
 sample01 = senv.Program(output_dir + '/raconn', util + ['sources/samples/01-raconn/raconn.cc'], CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = 'RASCAL_HELPERS', LIBS = 'rascal', LIBPATH = output_dir)
 
-# Build a source distribution package.
-src = Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', srcplist)
+# Build a source tarball.
+Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', srcplist)
