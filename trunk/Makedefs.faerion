@@ -219,15 +219,15 @@ clean-objs::
   endif
 
 # Remove temporary files irrecursively.
-cleandist-local::
+distclean-local::
   ifneq ($(DIRS),)
-	for i in $(DIRS); do $(MAKE) -C $$i cleandist; done
+	for i in $(DIRS); do $(MAKE) -C $$i distclean; done
   endif
 	rm -rf $(strip $(WORKLIST) Makedefs.faerion.include configure.log)
 
-cleandist:: cleandist-local $(custom-cleandist)
+distclean:: distclean-local $(custom-distclean)
 
-distclean:: cleandist-local $(custom-cleandist)
+distclean:: distclean-local $(custom-distclean)
 
 exportable-local::
   ifneq ($(wildcard .svn CVS),)

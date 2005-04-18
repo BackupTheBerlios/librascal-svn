@@ -7,7 +7,7 @@ TARGET  = executable
 PROG    = rasvc
 DEFS   += RASCAL_HELPERS
 SRCS    = $(wildcard *.cc)
-LIBS   += rascal faeutil stdc++
+LIBS   += rascal stdc++
 LIBDIR += ../../$(MDF_LIBARCH)
 
 ifeq ($(OSNAME),nt)

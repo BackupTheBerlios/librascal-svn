@@ -5,7 +5,7 @@ include ../../../Makedefs.faerion.include
 
 PROG    = test-03
 DEFS   += RASCAL_HELPERS
-LIBS   += rascal faeutil stdc++
+LIBS   += rascal stdc++
 SRCS    = $(wildcard *.cc)
 LIBDIR += ../../$(MDF_LIBARCH)
 

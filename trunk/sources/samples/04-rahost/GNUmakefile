@@ -6,7 +6,7 @@ include ../../../Makedefs.faerion.include
 TARGET  = executable
 PROG    = rahost
 SRCS    = $(wildcard *.cc)
-LIBS   += rascal faeutil stdc++
+LIBS   += rascal stdc++
 LIBDIR += ../../$(MDF_LIBARCH)
 
 ifeq ($(OSNAME),nt)

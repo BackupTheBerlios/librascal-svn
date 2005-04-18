@@ -9,7 +9,7 @@ DIRS   = ../common
 DEFS  += BUILD_RASCAL RASCAL_HELPERS
 SRCS   = $(wildcard *.rc *.cc)
 ARCH   = ../common/rascal.a
-LIBS   = ws2_32 mswsock iphlpapi faeutil pthreadGCE stdc++
+LIBS   = ws2_32 mswsock iphlpapi pthreadGCE stdc++
 
 ifneq ($(filter debug,$(OPTIONS)),)
   LIBS += flog
