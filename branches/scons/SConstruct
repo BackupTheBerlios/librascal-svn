@@ -73,6 +73,40 @@ bsd = Split("""
 	sources/bsd/rascal_work.cc
 	sources/bsd/rascal_write.cc
 	""")
+nt = Split("""
+	sources/nt/connectex.cc
+	sources/nt/connection.cc
+	sources/nt/connection_dg.cc
+	sources/nt/connection_st.cc
+	sources/nt/iocp.cc
+	sources/nt/oaccept.cc
+	sources/nt/oconnect.cc
+	sources/nt/oreader.cc
+	sources/nt/oreader_dg.cc
+	sources/nt/overlapped.cc
+	sources/nt/owriter.cc
+	sources/nt/owriter_dg.cc
+	sources/nt/rascal.cc
+	sources/nt/rascal_accept.cc
+	sources/nt/rascal_connect.cc
+	sources/nt/rascal_get_rq_size.cc
+	sources/nt/rascal_get_sq_size.cc
+	sources/nt/rascal_init.cc
+	sources/nt/rascal_read.cc
+	sources/nt/rascal_set_context.cc
+	sources/nt/rascal_set_dispatcher.cc
+	sources/nt/rascal_shrink.cc
+	sources/nt/rascal_write.cc
+	""")
+
+# Platform-dependent code.
+if env['PLATFORM'] == 'win32':
+	libsrc = util + common + bsd
+else:
+	libsrc = util + common + nt
+
+# The list of files to include in a source package.
+# This really has to be collected automatically.
 srcplist = Split("""
 	LICENSE
 	SConstruct
