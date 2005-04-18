@@ -11,49 +11,15 @@
 #define __faeutil_string_h
 
 #include <stddef.h> /* for size_t */
-#include <string.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-#ifndef HAVE_atou
 unsigned int atou(const char *);
-#endif
-#ifndef HAVE_strlcpy
-void strlcpy(char *, const char *, size_t);
-#endif
-
-#ifndef HAVE_strlcat
-void strlcat(char *, const char *, size_t);
-#endif
-
-#ifndef HAVE_strlcpya
+void strlcpy_local(char *, const char *, size_t);
+void strlcat_local(char *, const char *, size_t);
 void strlcpya(char *, size_t, ...);
-#endif
-
-#ifndef HAVE_strlcata
 void strlcata(char *, size_t, ...);
-#endif
-
-#ifndef HAVE_strisdigit
 int strisdigit(const char *);
-#endif
-
-#ifndef HAVE_strtoupper
 void strtoupper(char *);
-#endif
-
-#ifndef HAVE_strtok_r
 char * strtok_r(char *src, const char *sep, char **state);
-#endif
-
-#ifndef HAVE_strtok
 char * strtok(char *src, const char *sep);
-#endif
-
-#if defined(__cplusplus)
-}
-#endif
 
 #endif /* __faeutil_string_h */

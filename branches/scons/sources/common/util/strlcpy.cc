@@ -2,10 +2,9 @@
 // Copyright (c) 2002-2004 hex@faerion.oss and others.
 // $Id$
 
-#ifndef HAVE_strlcpy
-#include "string.h"
+#include "fustring.h"
 
-void strlcpy(char *dst, const char *src, size_t size)
+void strlcpy_local(char *dst, const char *src, size_t size)
 {
 	while (size != 0 && *src != '\0') {
 		*dst++ = *src++;
@@ -17,4 +16,3 @@ void strlcpy(char *dst, const char *src, size_t size)
 
 	*dst = '\0';
 }
-#endif

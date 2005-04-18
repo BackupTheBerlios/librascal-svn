@@ -8,7 +8,7 @@
 #include "object.h"
 #include "debug.h"
 #include "resolver/resolver.h"
-#include "util/string.h"
+#include "util/fustring.h"
 
 rrid_t rascal_connect_service(const char *name, const char *proto, const char *domain, rascal_dispatcher disp, void *context, rascal_rcs_filter filter)
 {

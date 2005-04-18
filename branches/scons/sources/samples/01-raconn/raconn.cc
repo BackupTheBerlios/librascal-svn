@@ -14,6 +14,7 @@
 # define sleep(x) Sleep(x*1000)
 #else
 # include <sys/types.h>
+# include <unistd.h>
 #endif
 #include <sys/stat.h>
 #include <rascal.h>

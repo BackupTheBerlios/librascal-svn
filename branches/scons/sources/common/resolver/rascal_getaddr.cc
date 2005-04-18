@@ -7,7 +7,7 @@
 // This file contains all hostname-to-numeric resolution code.
 
 #include <string.h>
-#include "../util/string.h"
+#include "../util/fustring.h"
 #include "resolver.h"
 #include "../debug.h"
 
@@ -85,7 +85,7 @@ bool getaddr::dump(char *&dst, unsigned int &size)
 }
 
 
-rrid_t rascal_getaddr(const char *host, rascal_getaddr_callback cb, void *context)
+extern "C" rrid_t rascal_getaddr(const char *host, rascal_getaddr_callback cb, void *context)
 {
 	rrid_t rid;
 	new getaddr(host, cb, context, rid);
