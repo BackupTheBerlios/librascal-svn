@@ -12,9 +12,9 @@ DISTMASK ?= *.h *.c *.cc *.css *.docbook *.dtd *.exp GNUmakefile Makefile
 DISTLIST += Makedefs.faerion GNUmakefile configure configure.in LICENSE exports
 WORKLIST += $(wildcard $(OBJS) $(PROG) $(PROG).def $(PROG).a .docbook.paged .depend)
 
-ifndef MDF_OSNAME
+ifndef OSNAME
   ifdef WINDIR
-    MDF_OSNAME := NT
+    OSNAME := nt
   endif
 endif
 
@@ -67,7 +67,7 @@ else
     endif
   endif
   # Windows-specific directives.
-  ifeq ($(MDF_OSNAME),NT)
+  ifeq ($(OSNAME),nt)
     ifneq ($(filter windows,$(OPTIONS)),)
       CFLAGS += -windows
       LFLAGS += -windows
@@ -158,12 +158,12 @@ ifeq (library.static,$(TARGET))
 ifeq (library.shared,$(TARGET))
 $(PROG): $(OBJS) $(ARCH) $(EXPS)
   ifeq ($(COMPILE),)
-    ifeq ($(MDF_OSNAME),NT)
+    ifeq ($(OSNAME),nt)
 	rm -f $(PROG).def $(PROG).a
     endif
 	$(strip $(LINK))
 	ls -ld $(PROG)
-    ifeq ($(MDF_OSNAME),NT)
+    ifeq ($(OSNAME),nt)
 	dlltool $(strip -z $(PROG).def -l $(PROG).a -D $(PROG) $(OBJS) $(ARCH))
     endif
   endif

@@ -12,11 +12,11 @@ LIBS   += stdc++
 DIRS    = ../common
 EXPS    = librascal.exp
 
-ifneq ($(MDF_OSNAME),NT)
+ifneq ($(OSNAME),nt)
   LIBS += resolv
 endif
 
-ifeq ($(MDF_OSNAME),Darwin)
+ifeq ($(OSNAME),darwin)
 # -exported_symbols_list filename
 endif
 

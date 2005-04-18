@@ -23,7 +23,7 @@ fake: all
 	cp LICENSE fake-$(VERS)/share/rascal
 	cp sources/rascal.h fake-$(VERS)/include/
 	cp sources/$(MDF_LIBARCH)/librascal.$(MDF_SOEXT) fake-$(VERS)/lib
-ifeq ($(MDF_OSNAME),NT)
+ifeq ($(OSNAME),nt)
 	cp sources/$(MDF_LIBARCH)/librascal.$(MDF_SOEXT).a fake-$(VERS)/lib
 endif
 

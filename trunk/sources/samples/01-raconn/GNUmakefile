@@ -10,7 +10,7 @@ SRCS    = $(wildcard *.cc)
 LIBS   += rascal faeutil stdc++
 LIBDIR += ../../$(MDF_LIBARCH)
 
-ifeq ($(MDF_OSNAME),NT)
+ifeq ($(OSNAME),nt)
   PROG := $(PROG).exe
   SRCS += $(wildcard *.rc)
   LIBS += pthreadGCE
