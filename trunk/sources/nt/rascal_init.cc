@@ -4,7 +4,7 @@
 //
 // $Id$
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <windows.h>
 #include <iphlpapi.h>
 #include "connection.h"
@@ -46,16 +46,17 @@ static void nt_initres(void)
 	FIXED_INFO *fi = NULL;
 
 	if (GetNetworkParams(fi, &fisize) == ERROR_BUFFER_OVERFLOW)
-		fi = reinterpret_cast<FIXED_INFO *>(alloca(fisize));
+		fi = reinterpret_cast<FIXED_INFO *>(malloc(fisize));
 
 	if (GetNetworkParams(fi, &fisize) != ERROR_SUCCESS) {
 		debug((flog, rl_resolver, "could not retreive FIXED_INFO (error %ld)", GetLastError()));
-		return;
+	} else {
+		ns_initres_get(&fi->DnsServerList);
+		debug((flog, rl_resolver, "resolvers initialized"));
 	}
 
-	ns_initres_get(&fi->DnsServerList);
-
-	debug((flog, rl_resolver, "resolvers initialized"));
+	if (fi != NULL)
+		free(fi);
 }
 
 
