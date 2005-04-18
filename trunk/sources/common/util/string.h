@@ -13,6 +13,8 @@
 #include <stddef.h> /* for size_t */
 #include <string.h>
 
+#include "../../../configure.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
