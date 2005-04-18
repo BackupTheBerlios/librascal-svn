@@ -5,6 +5,7 @@
 if [ -f "$HOME/.makedefs" ]; then . "$HOME/.makedefs"; fi
 
 find_exe "CC" "cc" "gcc" "mingw32-gcc"
+find_exe "MK" "gmake" "make"
 find_exe "RC" "windres"
 find_exe "CPP" "cpp -E"
 find_exe "MDF_GNUPG" "gpg"
@@ -35,3 +36,9 @@ DEFS="$DEFS VERSION=$VERSION VERSION_NUM=$VERSION_NUM"
 
 out_include "configure.h"
 out_makefile "Makedefs.faerion.include" "*" "MDF_LIBARCH" "VERSION" "VERSION_NUM"
+
+cat << END
+
+Build command: $MK.
+      Targets: all depend dist distclean.
+END
