@@ -4,26 +4,26 @@
 //
 // $Id$
 
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #ifdef _WIN32
 # include <windows.h>
 # include <io.h>
+# define sleep(x) Sleep(x*1000)
 #else
 # include <sys/types.h>
 #endif
 #include <sys/stat.h>
-#include <faeutil/faeutil.h>
-#include <faeutil/sem.h>
 #include <rascal.h>
+#include "sem.h"
 
 #ifndef dimof
 # define dimof(arr) (sizeof(arr) / sizeof(arr[0]))
 #endif
 
 using namespace rascal;
-using namespace faeutil;
 
 static const char *usage_msg =
 	"This is a test program for RASCAL, which establishes an outgoing\n"

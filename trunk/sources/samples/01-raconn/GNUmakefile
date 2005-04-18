@@ -4,9 +4,10 @@
 include ../../../Makedefs.faerion.include
 
 TARGET  = executable
+INCDIR += ../../common/util
 PROG    = raconn
 DEFS   += RASCAL_HELPERS
-SRCS    = $(wildcard *.cc)
+SRCS    = $(wildcard *.cc ../../common/util/*.cc)
 LIBS   += rascal stdc++
 LIBDIR += ../../$(MDF_LIBARCH)
 

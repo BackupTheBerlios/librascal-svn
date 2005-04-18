@@ -19,7 +19,7 @@ rrid_t rascal_connect_ex(const sock_t *target, rascal_dispatcher disp, void *con
 
 	if (strcmp(mode, "udp") == 0)
 		tmp = new connection_dg(disp, context);
-	else if (strcmp(mode, "tcp"))
+	else if (strcmp(mode, "tcp") == 0)
 		tmp = new connection_st(disp, context);
 	else
 		return REC_INVALID_ARGUMENT;
