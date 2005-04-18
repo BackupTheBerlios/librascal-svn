@@ -255,10 +255,10 @@ endif
 ifeq ($(PACK),)
 	$(error The PACK variable is not set.)
 endif
-	rm -rf $(PACK)-$(VERSION) $(PACK)-$(VERSION).tar.gz
+	rm -rf $(PACK)-$(VERSION) $(PACK)-$(VERSION)-src.tar.gz
 	mkdir -p $(PACK)-$(VERSION)
 	find . -type f \( -name Makedefs.faerion $(foreach MASK,$(DISTMASK),-o -name "$(MASK)") \) | xargs tar cf tmp.tar $(wildcard $(DISTLIST))
-	cd $(PACK)-$(VERSION) && tar xf ../tmp.tar && cd .. && tar cfz $(PACK)-$(VERSION).tar.gz $(PACK)-$(VERSION)
+	cd $(PACK)-$(VERSION) && tar xf ../tmp.tar && cd .. && tar cfz $(PACK)-$(VERSION)-src.tar.gz $(PACK)-$(VERSION)
 	rm -rf tmp.tar $(PACK)-$(VERSION)
 	ls -ld $(PACK)-$(VERSION)-src.tar.gz
 
