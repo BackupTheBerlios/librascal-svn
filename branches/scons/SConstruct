@@ -11,18 +11,68 @@ conf = Configure(env)
 if not conf.CheckFunc('strlcpy'):
 	print 'Could not find strlcpy(), using local version.'
 	conf.env.Append('-Dstrlcpy=strlcpy_local')
-conf.CheckFunc('strlcpya')
 if not conf.CheckLib('pthread'):
 	Exit(1)
 env = conf.Finish()
 
+# Special flags for building sample programs.
+senv = env.Copy(CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = 'RASCAL_HELPERS', LIBS = 'rascal', LIBPATH = output_dir)
+
 # Source files.
-util = ['sources/common/util/ftspec.cc', 'sources/common/util/gettime.cc', 'sources/common/util/memory.cc', 'sources/common/util/mutex.cc', 'sources/common/util/random.cc', 'sources/common/util/sem.cc', 'sources/common/util/strlcpya.cc']
-common = ['sources/common/datachain.cc', 'sources/common/datachainitem.cc', 'sources/common/debug.cc', 'sources/common/object.cc', 'sources/common/packetchain.cc', 'sources/common/rascal.cc', 'sources/common/rascal_accept_service.cc', 'sources/common/rascal_aton.cc', 'sources/common/rascal_cancel.cc', 'sources/common/rascal_connect.cc', 'sources/common/rascal_connect_service.cc', 'sources/common/rascal_dumpfile.cc', 'sources/common/rascal_get_errmsg.cc', 'sources/common/rascal_ntoa.cc', 'sources/common/rascal_options.cc', 'sources/common/rascal_wait.cc', 'sources/common/resolver/header.cc', 'sources/common/resolver/monitor.cc', 'sources/common/resolver/rascal_getaddr.cc', 'sources/common/resolver/rascal_gethost.cc', 'sources/common/resolver/rascal_getsrv.cc', 'sources/common/resolver/rascal_set_nameserver.cc', 'sources/common/resolver/request.cc', 'sources/common/resolver/resolver.cc']
-bsd = ['sources/bsd/connection.cc', 'sources/bsd/connection_dg.cc', 'sources/bsd/connection_in.cc', 'sources/bsd/rascal_accept.cc', 'sources/bsd/rascal_connect.cc', 'sources/bsd/rascal_get_rq_size.cc', 'sources/bsd/rascal_get_sq_size.cc', 'sources/bsd/rascal_init.cc', 'sources/bsd/rascal_read.cc', 'sources/bsd/rascal_set_context.cc', 'sources/bsd/rascal_set_dispatcher.cc', 'sources/bsd/rascal_shrink.cc', 'sources/bsd/rascal_work.cc', 'sources/bsd/rascal_write.cc']
+util = Split("""
+	sources/common/util/ftspec.cc
+	sources/common/util/gettime.cc
+	sources/common/util/memory.cc
+	sources/common/util/mutex.cc
+	sources/common/util/random.cc
+	sources/common/util/sem.cc
+	sources/common/util/strlcpya.cc
+	""")
+common = Split("""
+	sources/common/datachain.cc
+	sources/common/datachainitem.cc
+	sources/common/debug.cc
+	sources/common/object.cc
+	sources/common/packetchain.cc
+	sources/common/rascal.cc
+	sources/common/rascal_accept_service.cc
+	sources/common/rascal_aton.cc
+	sources/common/rascal_cancel.cc
+	sources/common/rascal_connect.cc
+	sources/common/rascal_connect_service.cc
+	sources/common/rascal_dumpfile.cc
+	sources/common/rascal_get_errmsg.cc
+	sources/common/rascal_ntoa.cc
+	sources/common/rascal_options.cc
+	sources/common/rascal_wait.cc
+	sources/common/resolver/header.cc
+	sources/common/resolver/monitor.cc
+	sources/common/resolver/rascal_getaddr.cc
+	sources/common/resolver/rascal_gethost.cc
+	sources/common/resolver/rascal_getsrv.cc
+	sources/common/resolver/rascal_set_nameserver.cc
+	sources/common/resolver/request.cc
+	sources/common/resolver/resolver.cc
+	""")
+bsd = Split("""
+	sources/bsd/connection.cc
+	sources/bsd/connection_dg.cc
+	sources/bsd/connection_in.cc
+	sources/bsd/rascal_accept.cc
+	sources/bsd/rascal_connect.cc
+	sources/bsd/rascal_get_rq_size.cc
+	sources/bsd/rascal_get_sq_size.cc
+	sources/bsd/rascal_init.cc
+	sources/bsd/rascal_read.cc
+	sources/bsd/rascal_set_context.cc
+	sources/bsd/rascal_set_dispatcher.cc
+	sources/bsd/rascal_shrink.cc
+	sources/bsd/rascal_work.cc
+	sources/bsd/rascal_write.cc
+	""")
 
 # Build the main library.
 lib = env.SharedLibrary(output_dir + '/rascal', util + common + bsd, CCFLAGS = '-DBUILD_RASCAL')
 
 # Build the samples.
-sample01 = env.Program(output_dir + '/raconn', util + ['sources/samples/01-raconn/raconn.cc'], CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = 'RASCAL_HELPERS', LIBS = 'rascal', LIBPATH = output_dir)
+sample01 = senv.Program(output_dir + '/raconn', util + ['sources/samples/01-raconn/raconn.cc'], CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = 'RASCAL_HELPERS', LIBS = 'rascal', LIBPATH = output_dir)
