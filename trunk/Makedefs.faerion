@@ -257,7 +257,7 @@ ifeq ($(PACK),)
 endif
 	rm -rf $(PACK)-$(VERSION) $(PACK)-$(VERSION)-src.tar.gz
 	mkdir -p $(PACK)-$(VERSION)
-	find . -type f \( -name Makedefs.faerion $(foreach MASK,$(DISTMASK),-o -name "$(MASK)") \) | xargs tar cf tmp.tar $(wildcard $(DISTLIST))
+	find . -type f \( -name Makedefs.faerion $(foreach MASK,$(DISTMASK),-o -name "$(MASK)") \) | grep -vF 'configure.h' | xargs tar cf tmp.tar $(wildcard $(DISTLIST))
 	cd $(PACK)-$(VERSION) && tar xf ../tmp.tar && cd .. && tar cfz $(PACK)-$(VERSION)-src.tar.gz $(PACK)-$(VERSION)
 	rm -rf tmp.tar $(PACK)-$(VERSION)
 	ls -ld $(PACK)-$(VERSION)-src.tar.gz

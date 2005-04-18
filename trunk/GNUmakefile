@@ -1,5 +1,5 @@
 # Makefile for GNU Make.
-# $Id: GNUmakefile 14 2005-01-15 23:05:00Z hex $
+# $Id$
 
 -include Makedefs.faerion.include
 
