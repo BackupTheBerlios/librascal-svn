@@ -5,12 +5,10 @@
 // $Id$
 
 #include "connection.h"
-#include "../common/rascal.h"
+#include "../common/common.h"
 #include "../common/datachain.h"
 #include "iocp.h"
 #include "../common/debug.h"
-
-using namespace faeutil;
 
 IMPLEMENT_ALLOCATORS(connection);
 

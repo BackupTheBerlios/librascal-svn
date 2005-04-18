@@ -4,6 +4,9 @@
 //
 // $Id: rascal.rc 21 2005-01-23 00:03:02Z hex $
 
+#undef VERSION_NUM
+#define VERSION_NUM 1,0,0,0
+
 #ifdef BUILD_RASCAL
 # define INTERNAL_NAME "rascal"
 # define ORIGINAL_FILENAME "rascal.dll"

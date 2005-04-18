@@ -4,19 +4,25 @@
 //
 // $Id$
 
+#include <string.h>
 #include "connection.h"
 #include "connection_dg.h"
 #include "connection_st.h"
 
-rrid_t rascal_connect_ex(const sock_t *target, rascal_dispatcher disp, void *context, int mode)
+rrid_t rascal_connect_ex(const sock_t *target, rascal_dispatcher disp, void *context, const char *mode)
 {
 	rrid_t rc;
 	connection *tmp;
 
-	if (mode == SOCK_DGRAM)
+	if (mode == NULL)
+		mode = "tcp";
+
+	if (strcmp(mode, "udp") == 0)
 		tmp = new connection_dg(disp, context);
-	else
+	else if (strcmp(mode, "tcp"))
 		tmp = new connection_st(disp, context);
+	else
+		return REC_INVALID_ARGUMENT;
 
 	if (tmp == NULL)
 		return GetLastError() | REC_SYSERROR_MASK;
@@ -32,5 +38,5 @@ rrid_t rascal_connect_ex(const sock_t *target, rascal_dispatcher disp, void *con
 
 rrid_t rascal_connect(const sock_t *target, rascal_dispatcher disp, void *context)
 {
-	return rascal_connect_ex(target, disp, context, SOCK_STREAM);
+	return rascal_connect_ex(target, disp, context, NULL);
 }

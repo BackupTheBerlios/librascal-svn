@@ -4,13 +4,11 @@
 //
 // $Id$
 
-#include <faeutil/mutex.h>
-#include "connection_st.h"
+#include "../common/common.h"
 #include "../common/datachain.h"
-#include "iocp.h"
 #include "../common/debug.h"
-
-using namespace faeutil;
+#include "connection_st.h"
+#include "iocp.h"
 
 // Little helper function.
 template <class T> inline static T r_min(T a, T b) { return (a < b) ? a : b; }

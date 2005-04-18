@@ -4,7 +4,6 @@
 //
 // $Id$
 
-// #include "../util/faeutil.h"
 #include "resolver.h"
 #include "../debug.h"
 

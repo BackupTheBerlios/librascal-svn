@@ -4,7 +4,7 @@
 //
 // $Id$
 
-#include "../common/rascal.h"
+#include "../common/common.h"
 
 extern int fix_exports();
 

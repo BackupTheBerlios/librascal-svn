@@ -9,7 +9,7 @@
 #include <iphlpapi.h>
 #include "connection.h"
 #include "iocp.h"
-#include "../common/rascal.h"
+#include "../common/common.h"
 #include "../common/debug.h"
 
 extern rrid_t connect_ex_init(void);

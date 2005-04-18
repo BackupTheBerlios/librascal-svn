@@ -7,8 +7,8 @@
 #ifndef __rascal_nt_connection_h
 #define __rascal_nt_connection_h
 
-#include <faeutil/memory.h>
 #include <winsock2.h>
+#include "../common/util/memory.h"
 #include "../common/object.h"
 
 #define OVERLAPPED_DATA_SIZE 2048
@@ -39,7 +39,7 @@ protected:
 	// Whether there is an active owriter_st.
 	bool is_writing;
 	// Thread safety.
-	faeutil::mutex mx;
+	mutex mx;
 	// This saves us from rewriting several event handlers in _dg.
 	virtual void spawn_reader(void) = 0;
 	virtual void spawn_writer(bool force_idle = false) = 0;
@@ -97,7 +97,7 @@ protected:
 	// without requiring to add them all to the friend list.
 	sock_t& get_peer(void) { return host->peer; }
 	SOCKET& get_socket(void) { return host->s; }
-	faeutil::mutex& get_mutex(void) { return host->mx; }
+	mutex& get_mutex(void) { return host->mx; }
 	rascal_dispatcher& get_disp(void) { return host->disp; }
 	void *& get_context(void) { return host->context; }
 	bool& is_writing(void) { return host->is_writing; }
