@@ -23,7 +23,7 @@ find_func arc4random
 find_func strlcat
 find_func strlcpy
 
-if [ "$MDF_OSNAME" = "NT" ]; then
+if [ "$_OSNAME" = "nt" ]; then
   MDF_LIBARCH="nt"
 else
   MDF_LIBARCH="bsd"
