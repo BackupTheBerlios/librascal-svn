@@ -64,7 +64,7 @@ const char * get_event_name(int id)
 
 void sock_t::put(struct sockaddr_in &sa) const
 {
-	bzero(&sa, sizeof(sa));
+	memset(&sa, 0, sizeof(sa));
 
 	sa.sin_family      = AF_INET;
 	sa.sin_port        = htons(port);
