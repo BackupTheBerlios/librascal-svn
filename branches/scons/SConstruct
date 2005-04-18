@@ -97,13 +97,14 @@ nt = Split("""
 	sources/nt/rascal_set_dispatcher.cc
 	sources/nt/rascal_shrink.cc
 	sources/nt/rascal_write.cc
+	sources/nt/rascal.rc
 	""")
 
 # Platform-dependent code.
 if env['PLATFORM'] == 'win32':
-	libsrc = util + common + bsd
-else:
 	libsrc = util + common + nt
+else:
+	libsrc = util + common + bsd
 
 # The list of files to include in a source package.
 # This really has to be collected automatically.
@@ -146,6 +147,7 @@ srcplist = Split("""
 	sources/nt/iocp.cc
 	sources/nt/rascal_set_dispatcher.cc
 	sources/nt/rascal_init.cc
+	sources/nt/rascal.rc
 	sources/samples/04-rahost/rahost.cc
 	sources/samples/07-rasvc/rasvc.cc
 	sources/samples/02-raconns/test-02.cc
@@ -199,6 +201,7 @@ srcplist = Split("""
 	sources/common/rascal_connect_service.cc
 	sources/common/object.cc
 	sources/common/object.h
+	sources/common/rascal.rc
 	sources/common/rascal_accept_service.cc
 	sources/common/rascal_cancel.cc
 	sources/common/packetchain.cc
@@ -217,7 +220,7 @@ srcplist = Split("""
 	""")
 
 # Build the main library.
-lib = env.SharedLibrary(output_dir + '/rascal', util + common + bsd, CCFLAGS = '-DBUILD_RASCAL')
+lib = env.SharedLibrary(output_dir + '/rascal', libsrc, CCFLAGS = '-DBUILD_RASCAL')
 
 # Build the samples.
 sample01 = senv.Program(output_dir + '/raconn', util + ['sources/samples/01-raconn/raconn.cc'], CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = 'RASCAL_HELPERS', LIBS = 'rascal', LIBPATH = output_dir)
