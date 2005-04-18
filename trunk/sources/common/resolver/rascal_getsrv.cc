@@ -6,6 +6,7 @@
 
 #include <string.h>
 #include "../util/random.h"
+#include "../util/string.h"
 #include "resolver.h"
 #include "../debug.h"
 

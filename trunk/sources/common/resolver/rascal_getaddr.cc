@@ -7,7 +7,7 @@
 // This file contains all hostname-to-numeric resolution code.
 
 #include <string.h>
-// #include "../util/faeutil.h"
+#include "../util/string.h"
 #include "resolver.h"
 #include "../debug.h"
 

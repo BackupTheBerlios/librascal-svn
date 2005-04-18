@@ -12,6 +12,7 @@
 // the request id with the original one and calls the user handler.
 
 #include <string.h>
+#include "common.h"
 #include "util/list.h"
 #include "object.h"
 #include "debug.h"

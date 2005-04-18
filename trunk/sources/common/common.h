@@ -16,7 +16,7 @@
 #endif
 #include "util/mutex.h"
 #include "util/memory.h"
-#include "rascal.h"
+#include "../rascal.h"
 #if defined(HAVE_libdmalloc) && defined(_DEBUG)
 # include <dmalloc.h>
 #endif
