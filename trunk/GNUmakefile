@@ -8,7 +8,7 @@ PACK = librascal
 VERS = 2.0
 PREQ = configure
 
-ifneq ($(WINDIR),)
+ifeq ($(OSNAME),nt)
   PACKAGES = $(PACK)-$(VERS).zip
 endif
 
@@ -37,4 +37,12 @@ install: fake
 tidy:
 	find . -type f \( -name '*.o' -o -name '.*' -o -name '*.dylib' \) | xargs rm -rf docbook/html Makedefs.faerion.include configure.log
 
-dist: dist-default
+dist-nt:
+	rm -rf librascal-$(VERSION) librasca-$(VERSION)-win.zip
+	mkdir -p librascal-$(VERSION)/lib librascal-$(VERSION)/include
+	cp sources/nt/librascal.dll sources/nt/librascal.dll.a librascal-$(VERSION)/lib
+	cp sources/rascal.h librascal-$(VERSION)/include
+	zip -r librascal-$(VERSION)-win.zip librascal-$(VERSION)
+	ls -ld librascal-$(VERSION)-win.zip
+
+dist: dist-default $(if $(OSNAME)=nt,dist-nt,)
