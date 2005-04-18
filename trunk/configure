@@ -15,11 +15,13 @@ find_framework FaerionLog || find_lib flog
 if [ "$MF_DMALLOC" = "1" ]; then
 	find_lib dmallocthcxx
 fi
+if [ "$OSNAME" != "nt" ]; then
+	find_func kqueue
+	find_func res_init resolv -inc "sys/types.h" "netinet/in.h" "resolv.h"
+fi
 find_func arc4random
-find_func kqueue
 find_func strlcat
 find_func strlcpy
-find_func res_init resolv -inc "sys/types.h" "netinet/in.h" "resolv.h"
 
 if [ "$MDF_OSNAME" = "NT" ]; then
   MDF_LIBARCH="nt"
