@@ -1,0 +1,98 @@
+<chapter id="implementation">
+	<title>Implementation details</title>
+
+	<para>Functions and data types required to use the library are declared in header file <filename class="header">rascal.h</filename>.  The library is written in C++; however, considering the "pure C" API, it can be used by C programs just as well.  &product; is only available as a dynamic library, static linking is not supported.</para>
+	<para>The naming convention used in this documentation uses the term <emphasis>"application"</emphasis> to refer to a program that is using functions provided by the library.</para>
+
+	<section id="requests">
+		<title>Request processing</title>
+		<para>The library is completely asynchronous.  This means that a call to a library function returns immediately, always.  Operations that take time to complete are scheduled for background execution and return a handle to the operation.  The <link linkend="rascal_isok"><function>rascal_isok</function></link> function must first be used on these handles to make sure that the operation has been successfully scheduled.  Any of the following actions can then be performed:</para>
+		<orderedlist>
+			<listitem>
+				<para>Cancel the operation by calling the <link linkend="rascal_cancel"><function>rascal_cancel</function></link> function.</para>
+			</listitem>
+			<listitem>
+				<para>Store the handle for later use.</para>
+			</listitem>
+			<listitem>
+				<para>Ignore the handle, if no interaction with the request is planned.</para>
+			</listitem>
+		</orderedlist>
+	</section>
+
+	<section id="events">
+		<title>Event processing</title>
+		<para>Because the library is realtime, no function may ever block the execution.  Therefore all functions return immediately, either with an immediate result available, or scheduling the operation for background execution.</para>
+		<para>Events are delivered to a user defined callback function called <emphasis>event dispatcher</emphasis>.  The connection that the event is delivered for is blocked for write operations during the time of dispatcher's execution.  This means that all requests to write to the connection are scheduled, but the actual writing will start as soon as the event dispatcher finishes executing and returns control to the library.  (This is done to optimize network performance when large amounts of small data portions are written.)</para>
+	</section>
+
+	<section id="errors">
+		<title>Error handling</title>
+		<para>The library does <emphasis>not</emphasis> use neither exceptions nor anything else but request identifiers to indicate errors.  What this (also) means is that the library does not handle neither exceptions nor signals nor anything else.  If you pass a bad pointer to a function and its execution is interrupted, further execution might be impossible due to internal objects left locked.</para>
+		<para>Human readable error messages corresponding to error codes returned by the library can be retreived using the <link linkend="rascal_get_errmsg"><function>rascal_get_errmsg</function></link> function.</para>
+	</section>
+
+	<section id="dataflow">
+		<title>Data flow buffering</title>
+		<para>
+			All data transfer functions make use of the internal per-connection buffer to optimize performance and prevent the application from implementing its own complicated memory management.
+			The incoming data flow is accumulated in the incoming buffer and can be partially or fully reterived using functions <link linkend="rascal_read"><function>rascal_read</function></link> and <link linkend="rascal_reads"><function>rascal_reads</function></link>.
+			The <link linkend="rascal_reads"><function>rascal_reads</function></link> function was designed to simplify working with text based protocols, such as <ulink url="http://www.ietf.org/rfc/rfc2821.txt">SMTP</ulink> or <ulink url="http://www.ietf.org/rfc/rfc1459.txt">IRC</ulink>: it retrieves a single line of text from the head of the FIFO buffer.
+		</para>
+		<para>
+			The output function, <link linkend="rascal_write"><function>rascal_write</function></link>, appends the data to the output buffer of a connection.
+		</para>
+		<para>
+			Note that all transfer functions copy the data either to or from the internal buffer.
+			There are no functions to receive data directly into user defined area of memory or to send from there.
+		</para>
+		<para>
+			Note also that the data is sent and received by portions, each several kilobytes in size.
+			Keep this in mind when reading large amounts of data of a known size, for which you can allocate enough memory.
+			Also keep that in mind when writing large amounts of data that you anyway keep in memory.
+			The size of the internal cache is not limited, but frequent expansion can lead to poor performance and inoptimal resource usage; it is preferred that the application sends each portion of data as soon as a <link linkend="rop_write">rop_write</link> event is reported (see below).
+		</para>
+	</section>
+
+	<section id="memory">
+		<title>Memory management</title>
+		<para>
+			The library performs caching of internally allocated objects.
+			This helps reducing the overhead of memory allocation (which is a complex procedure and involves things like thread locking and defragmentation).
+			The size of the cache pool can increase on the beginning of the application's networking activity, but it stabilizes and stops growing as the network load does.
+			The library does not provide the application with a way to determine the size of the pool; assume that the memory management is optimal.
+			The library does, however, provide a function to empty the pool of cached objects, which should only be used after burst operations which happen rarely.
+			Cleaning the pool too often leads to poor performance.
+		</para>
+		<para>
+			The library uses standard <function>malloc</function> and <function>free</function> functions, and there is no way the application can specify its own memory allocation functions.
+			This is made to guarantee consistent results of memory allocation by using a trusted source.
+		</para>
+	</section>
+
+	<section id="dns">
+		<title>Domain name and service resolution functions</title>
+		<para>
+			Though the main purpose of the library is working with data oriented TCP/IP connections, domain name resolution is another vital part because it is seldom the case when the numeric address of the destination connection endpoint is known to the user.
+			The library provides a limited set of functions sufficient to resolve hostnames and locate services using DNS.
+		</para>
+		<para>
+			The preferred way to establish a connection is to use <emphasis>service discovery</emphasis>, a technology that provides failure safety, load balancing and other ways to improve the user experience (see <ulink url="http://www.ietf.org/rfc/rfc2782.txt">RFC2782</ulink> for details).
+			The library provides a function for locating a service and connecting to it, <link linkend="rascal_connect_service"><function>rascal_connect_service</function></link>, and a function to install a local service handler, <link linkend="rascal_accept_service"><function>rascal_accept_service</function></link>.
+		</para>
+		<para>
+			For traditional DNS lookup there are functions <link linkend="rascal_gethost"><function>rascal_gethost</function></link> and <link linkend="rascal_getaddr"><function>rascal_getaddr</function></link>.
+			The library relies on a recursive name server (the vast majority of end-user name servers, such as ones operated by ISPs, are recursive).
+		</para>
+		<para>
+			The library supports multiple name servers for the purpose of failure safety.
+			The list of available servers is read from system settings when the library is initialized.
+			If an application needs to use a different set of name servers, it can be done using the <link linkend="rascal_set_nameserver"><function>rascal_set_nameserver</function></link> function.
+		</para>
+	</section>
+
+	<section id="threading">
+		<title>Threading model</title>
+		<para>The library is threads safe.  There are three modes of execution, guaranteed to satisfy the most developers' needs: non-threaded, single threaded and thread-per-CPU.  For threaded modes of execution, the application might need to use a thread locking mechanism, depending on the data isolation model being used by the application.  The library does not provide such functions; however, file "<filename>common/mutex.h</filename>" contains an example of a portable implementation of thread locking, which is used internally by the library and is guaranteed to work on all supported systems.</para>
+	</section>
+</chapter>

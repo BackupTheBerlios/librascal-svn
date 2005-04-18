@@ -1,0 +1,13 @@
+<chapter id="introduction">
+	<title>Introduction</title>
+	<para>&product; stands for Realtime Asynchronous Connection Abstraction Layer.  It is a library that provides functions for building portable, high-performance networking applications.  The following must be taken into consideration when deciding to start using the library:</para>
+	<itemizedlist>
+		<listitem><para>The library is fully asynchronous and performs no blocking operations, which makes it possible to use in time critical environments.  All requests either complete immediately or a completion notification is delivired using <link linkend="events">events</link>.</para></listitem>
+		<listitem><para>The library supports <link linkend="threading">multithreading</link>.</para></listitem>
+		<listitem><para>The library performs unconditional <link linkend="dataflow">data flow buffering</link> in both directions.</para></listitem>
+		<listitem><para>The library performs <link linkend="memory">caching of all internally allocated objects</link> to decrease the overhead of the memory allocation process.</para></listitem>
+		<listitem><para>The library provides functions for <link linkend="dns">working with DNS</link>, and doing so in a simple and effective manner.  The library makes use of SRV resource records to help achieve best user experience.</para></listitem>
+		<listitem><para>The library supports IPv6 on systems which have the sixth stack installed.</para></listitem>
+		<listitem><para>The library is open source and is licensed under the terms of <ulink url="http://www.gnu.org/copyleft/lesser.html">GNU LGPL</ulink>.</para></listitem>
+	</itemizedlist>
+</chapter>

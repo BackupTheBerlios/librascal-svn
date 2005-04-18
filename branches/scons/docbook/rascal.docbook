@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE book PUBLIC "-//faerion.oss//DTD Modified DocBook XML V4.2//EN" "rascal.dtd">
+<book id="rascal" lang="en">
+	<bookinfo>
+		<title>Realtime Asynchronous Connection Abstraction Layer</title>
+		<subtitle>Technical documentation</subtitle>
+		<authorgroup>
+			<author>
+				<othername>The Faerion Team</othername>
+			</author>
+		</authorgroup>
+
+		<keywordset>
+			<keyword>&product;</keyword>
+		</keywordset>
+
+		<abstract>
+			<para>&product; is a library designed to help building high-performance networking applications.  This is the technical reference for the library.</para>
+		</abstract>
+	</bookinfo>
+
+	&chintroduction;
+	&chimplementation;
+	&chtodo;
+
+	<appendix id="typeref" label="T">
+		&app.typeref;
+	</appendix>
+
+	<appendix id="funcref" label="F">
+		&app.funcref;
+	</appendix>
+
+	<!--
+	<appendix id="intref" label="I">
+		&app.intref;
+	</appendix>
+	-->
+</book>
