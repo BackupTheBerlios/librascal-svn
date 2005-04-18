@@ -8,7 +8,7 @@ PROG    = librascal.$(MDF_SOEXT)
 SRCS    = $(wildcard *.cc)
 DEFS   += BUILD_RASCAL RASCAL_HELPERS
 ARCH    = ../common/rascal.a
-LIBS   += faeutil stdc++
+LIBS   += stdc++
 DIRS    = ../common
 EXPS    = librascal.exp
 
