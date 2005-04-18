@@ -18,27 +18,22 @@ extern rrid_t connect_ex_init(void);
 static void ns_initres_get(IP_ADDR_STRING *ias)
 {
 	rrid_t rc;
-	sock_t *nslist;
-	unsigned int nscount = 0, nsidx = 0;
+	sock_t nslist[16];
+	unsigned int nscount = 0;
 	IP_ADDR_STRING *tmp;
 
-	for (tmp = ias; tmp != NULL; tmp = tmp->Next)
-		++nscount;
+	for (tmp = ias; tmp != NULL && nscount != dimof(nslist); tmp = tmp->Next, ++nscount) {
+		if (rascal_aton(tmp->IpAddress.String, &nslist[nscount].addr)) {
+			nslist[nscount].port = 53;
+			debug((flog, rl_resolver, "resolver %02u of %02u: %s", nsidx, nscount, tmp->IpAddress.String));
+		}
+	}
 
 	if (nscount == 0)
 		return;
 
-	nslist = reinterpret_cast<sock_t *>(alloca(sizeof(sock_t) * nscount));
-
-	for (tmp = ias; tmp != NULL; tmp = tmp->Next) {
-		if (rascal_aton(tmp->IpAddress.String, &nslist[nsidx].addr)) {
-			nslist[nsidx++].port = 53;
-			debug((flog, rl_resolver, "installed resolver %02u of %02u: %s", nsidx, nscount, tmp->IpAddress.String));
-		}
-	}
-
-	if (rascal_isok(rc = rascal_set_nameserver(nslist, nsidx))) {
-		debug((flog, rl_resolver, "installed %u nameservers", nsidx));
+	if (rascal_isok(rc = rascal_set_nameserver(nslist, nscount))) {
+		debug((flog, rl_resolver, "installed %u nameservers", nscount));
 	} else {
 		debug((flog, rl_resolver, "failed to install nameservers: %s", rascal::errmsg(rc).c_str()));
 	}

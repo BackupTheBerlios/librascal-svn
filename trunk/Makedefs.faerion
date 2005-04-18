@@ -260,7 +260,7 @@ endif
 	find . -type f \( -name Makedefs.faerion $(foreach MASK,$(DISTMASK),-o -name "$(MASK)") \) | xargs tar cf tmp.tar $(wildcard $(DISTLIST))
 	cd $(PACK)-$(VERSION) && tar xf ../tmp.tar && cd .. && tar cfz $(PACK)-$(VERSION).tar.gz $(PACK)-$(VERSION)
 	rm -rf tmp.tar $(PACK)-$(VERSION)
-	ls -ld $(PACK)-$(VERSION).tar.gz
+	ls -ld $(PACK)-$(VERSION)-src.tar.gz
 
 # Source building rules.
 .SUFFIXES: .o .c .cc .res .rc
