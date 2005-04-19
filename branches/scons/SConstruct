@@ -28,28 +28,55 @@ def listFiles(at, r):
 # Version number.
 version = '1.0'
 
+Help("""
+Usage: scons [options]
+
+The following options are available:
+
+  debug=1   : include debug symbols and output.
+""")
+
 # The directory in which built files are stored.
 output_dir = 'build'
 
 # The default environment.
 env = Environment()
-env.Append(CPPDEFINES = [('VERSION', version)])
+if env['PLATFORM'] == 'win32':
+	env = Environment(tools = ['mingw'])
+env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS', ('funs', 'rsample')], CPPPATH = ['sources', 'sources/common/util'], LIBPATH = output_dir)
 
 # Check the system configuration if we're not cleaning up.
 if env.GetOption('clean'):
 	print 'Skipping autoconfiguration due to a clean-up.'
 else:
+	print 'Configuring for platform: ' + env['PLATFORM'] + '.'
 	conf = Configure(env)
 	if not conf.CheckFunc('strlcpy'):
 		print 'Could not find strlcpy(), using local version.'
-		conf.env.Append('-Dstrlcpy=strlcpy_local')
-	if not conf.CheckLib('pthread'):
-		print 'You must have the pthread library installed.'
+		conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
+	if env['PLATFORM'] == 'win32':
+		# Windows specific.
+		if not conf.CheckLib('ws2_32'):
+			print 'The winsock-2 library is not available (very unusual).'
+			Exit(1)
+		if not conf.CheckLib('mswsock'):
+			print 'The mswsock library is required (usually available on nt).'
+			Exit(1)
+		if not conf.CheckLib('iphlpapi'):
+			print 'The iphlpapi library is required (usually available on nt).'
+			Exit(1)
+		if not conf.CheckLib(['pthread', 'pthreadGC', 'pthreadVC']):
+			print 'You must have the pthread library installed.'
+			Exit(1)
+	else:
+		# POSIX specific.
+		if not conf.CheckLib('pthread'):
+			print 'You must have the pthread library installed.'
+			Exit(1)
+	if not conf.CheckCHeader('pthread.h'):
+		print 'You must have the pthread library properly installed.'
 		Exit(1)
 	env = conf.Finish()
-
-# Special flags for building sample programs.
-senv = env.Copy(CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = ['RASCAL_HELPERS', ('funs', 'rsample')], LIBS = 'rascal', LIBPATH = output_dir)
 
 # Source files.
 srcUtil = listFiles(['sources/common/util'], re.compile(r'^.*(\.cc)$'))
@@ -64,7 +91,8 @@ else:
 env.SharedLibrary(os.path.join(output_dir, 'rascal'), srcLib, CCFLAGS = '-DBUILD_RASCAL')
 
 # Build the samples.
-senv.Program(os.path.join(output_dir, 'raconn'), srcUtil + ['sources/samples/01-raconn/raconn.cc'])
+# env.Program(os.path.join(output_dir, 'raconn'), srcUtil + ['sources/samples/01-raconn/raconn.cc'])
 
-# Build a source tarball.
-Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', listFiles(['.'], re.compile(r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$')))
+if env['PLATFORM'] != 'win32':
+	# Build a source tarball.
+	Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', listFiles(['.'], re.compile(r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$')))
