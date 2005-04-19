@@ -29,18 +29,22 @@ version = '1.0'
 # The directory in which built files are stored.
 output_dir = 'build'
 
-# Check the system configuration.
+# The default environment.
 env = Environment()
-conf = Configure(env)
-if not conf.CheckFunc('strlcpy'):
-	print 'Could not find strlcpy(), using local version.'
-	conf.env.Append('-Dstrlcpy=strlcpy_local')
-if not conf.CheckLib('pthread'):
-	print 'You must have the pthread library installed.'
-	Exit(1)
-env = conf.Finish()
-
 env.Append(CPPDEFINES = [('VERSION', version)])
+
+# Check the system configuration if we're not cleaning up.
+if env.GetOption('clean'):
+	print 'Skipping autoconfiguration due to a clean-up.'
+else:
+	conf = Configure(env)
+	if not conf.CheckFunc('strlcpy'):
+		print 'Could not find strlcpy(), using local version.'
+		conf.env.Append('-Dstrlcpy=strlcpy_local')
+	if not conf.CheckLib('pthread'):
+		print 'You must have the pthread library installed.'
+		Exit(1)
+	env = conf.Finish()
 
 # Special flags for building sample programs.
 senv = env.Copy(CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = ['RASCAL_HELPERS', ('funs', 'rsample')], LIBS = 'rascal', LIBPATH = output_dir)
