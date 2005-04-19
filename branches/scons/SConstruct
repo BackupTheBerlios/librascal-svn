@@ -7,19 +7,21 @@ import re
 
 # A function to list files in a directory.
 def listFilesW(at, r):
+	nodes = []
 	for location in at:
 		for file in os.listdir(location):
 			fname = os.path.join(location, file)
 			if os.path.isfile(fname):
 				if r.match(file):
-					yield fname
+					nodes.append(fname)
 			elif os.path.isdir(fname):
 				if not fname == '.svn':
 					for more in listFilesW([fname], r):
-						yield more
+						nodes.append(more)
+	return nodes
 
 def listFiles(at, r):
-	l = list(listFilesW(at, r))
+	l = listFilesW(at, r)
 	l.sort()
 	return l
 
