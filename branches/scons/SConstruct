@@ -42,8 +42,15 @@ output_dir = 'build'
 
 fnd = Finder()
 
+# Build options.
+opts = Options('config.options')
+opts.Add(
+	BoolOption('DEBUG', 'Set to include debug symbols and output', 0),
+	BoolOption('SAMPLES', 'Set to build sample programs', 0)
+	)
+
 # The default environment.
-env = Environment()
+env = Environment(options = opts, tools = ['mingw'])
 env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS', ('funs', 'rsample')], LIBPATH = output_dir)
 
 # Check the system configuration if we're not cleaning up.
@@ -59,7 +66,7 @@ else:
 		conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
 		# Windows specific.
 		if not conf.CheckLib('ws2_32'):
-			print 'The winsock-2 library is not available (very unusual).'
+			print 'The winsock2 library is not available (very unusual).'
 			Exit(1)
 		if not conf.CheckLib('mswsock'):
 			print 'The mswsock library is required (usually available on nt).'
@@ -81,18 +88,28 @@ else:
 		if not conf.CheckLib('pthread'):
 			print 'You must have the pthread library installed.'
 			Exit(1)
+	if env['DEBUG'] == 1:
+		if conf.CheckLib('flog'):
+			conf.env.Append(CPPDEFINES = 'HAVE_flog')
 	if not conf.CheckCHeader('pthread.h'):
 		print 'You must have the pthread library properly installed.'
 		Exit(1)
 	env = conf.Finish()
-
-Export('env', 'fnd')
 
 # Platform-dependent code.
 if env['PLATFORM'] == 'win32':
 	env['LIBARCH'] = 'nt'
 else:
 	env['LIBARCH'] = 'bsd'
+
+# Adapt to a debug build.
+if env['DEBUG'] == 1:
+	print '*** DEBUG BUILD ***'
+	env.Append(CPPDEFINES = '_DEBUG')
+	env.Append(CCFLAGS = '-g -O0')
+
+opts.Save('config.options', env)
+Export('env', 'fnd')
 
 # Build the library.
 SConscript(os.path.join('sources', env['LIBARCH'], 'SConscript'))

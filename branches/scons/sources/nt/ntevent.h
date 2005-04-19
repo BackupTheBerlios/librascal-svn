@@ -20,7 +20,7 @@ public:
 	void close() { if (hEvent != NULL) { CloseHandle(hEvent); hEvent = NULL; } }
 	void set() { SetEvent(hEvent); }
 	operator HANDLE () { return hEvent; }
-	operator WSAEVENT () { return reinterpret_cast<WSAEVENT>(hEvent); }
+	WSAEVENT get_wsa() const { return reinterpret_cast<WSAEVENT>(hEvent); }
 	DWORD wait_for_msg() { return MsgWaitForMultipleObjectsEx(1, &hEvent, INFINITE, QS_ALLPOSTMESSAGE, 2 /* MWMO_ALERTABLE */); }
 };
 

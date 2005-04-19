@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "debug.h"
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && defined(HAVE_flog)
 
 static flogdef_t logs[] =
 {

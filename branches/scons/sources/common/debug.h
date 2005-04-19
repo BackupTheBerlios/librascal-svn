@@ -20,7 +20,7 @@ enum raloglev
 	rl_iocp,
 };
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && defined(HAVE_flog)
 # include <flog.h>
 # define debug(str) flog_writef str
 extern flog_t flog;
