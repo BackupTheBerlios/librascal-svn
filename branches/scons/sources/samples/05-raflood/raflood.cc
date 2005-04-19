@@ -4,9 +4,8 @@
 //
 // $Id$
 
-#define RASCAL_HELPERS
-
 #include <ctype.h>
+#include <getopt.h>
 #ifdef _WIN32
 # include <malloc.h> // alloca()
 #endif
@@ -16,14 +15,13 @@
 #ifndef _WIN32
 # include <unistd.h>
 #else
+# include <windows.h>
 # define sleep(c) Sleep(c * 1000)
 #endif
-#include <faeutil/faeutil.h>
-#include <faeutil/time.h>
-#include "../../common/rascal.h"
+#include "ftspec.h"
+#include "rascal.h"
 
 using namespace rascal;
-using namespace faeutil;
 
 template <class T>
 static T ramin(T a, T b)
@@ -45,13 +43,13 @@ struct sinkdata
 	{
 		this->rid = rid;
 		bytes = 0;
-		faeutil_gettime(&sec, &msec);
+		gettime(&sec, &msec);
 	}
 	// Statistics.
 	unsigned int lifetime() const
 	{
 		unsigned int nsec, nmsec;
-		faeutil_gettime(&nsec, &nmsec);
+		gettime(&nsec, &nmsec);
 		return (nsec - sec) * 1000 + nmsec - msec;
 	}
 };
@@ -71,13 +69,13 @@ struct flooddata
 		this->rid = rid;
 		this->sent = 0;
 		this->want = want;
-		faeutil_gettime(&sec, &msec);
+		gettime(&sec, &msec);
 	}
 	// Statistics.
 	unsigned int lifetime() const
 	{
 		unsigned int nsec, nmsec;
-		faeutil_gettime(&nsec, &nmsec);
+		gettime(&nsec, &nmsec);
 		return (nsec - sec) * 1000 + nmsec - msec;
 	}
 	// Sends a portion of data.
@@ -270,7 +268,7 @@ int main(int argc, char * const * argv)
 				return usage();
 			break;
 		case 'v':
-			fprintf(stdout, "rahost version %d.%d.%d.%d\n", VERSION_NUM);
+			fprintf(stdout, "rahost version %s\n", VERSION);
 			return 0;
 		default:
 			return usage();
