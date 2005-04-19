@@ -1,11 +1,24 @@
-import os
+import os, sys, string
 Import('env', 'fnd')
+
+def libgen(source, target, env, for_signature):
+	action = ''
+	for key in string.split(os.environ['PATH'], ';'):
+		tool = os.path.join(key, 'dlltool.exe')
+		if os.path.isfile(tool):
+			action = tool + ' --dllname "' + str(source[0]) + '" --def "' + str(target[0]) + '.def" --output-lib "' + str(target[0]) + '.a"'
+	return action
 
 env.Append(CPPDEFINES = ['BUILD_RASCAL'], CPPPATH = ['../common/util'])
 objs = []
+
+env['BUILDERS']['Lib2a'] = Builder(generator = libgen, suffix = '', src_suffix = '')
 
 for item in fnd.listFiles(['.', '../common'], r'^.*(\.cc)$'):
 	fname, ext = os.path.splitext(item)
 	objs.append(env.SharedObject(fname + '.os', item))
 
-env.SharedLibrary('rascal', objs)
+dll = env.SharedLibrary('rascal', objs)
+
+if env['CC'] == 'cl':
+	env.Lib2a(dll)

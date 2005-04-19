@@ -34,7 +34,10 @@ Usage: scons [options]
 
 The following options are available:
 
-  debug=1   : include debug symbols and output.
+  DEBUG=yes   : include debug symbols and output.
+  RELEASE=yes : set when you are preparing a release package
+
+Send your comments to Justin Forest <justin.forest@gmail.com>
 """)
 
 # The directory in which built files are stored.
@@ -45,8 +48,9 @@ fnd = Finder()
 # Build options.
 opts = Options('config.options')
 opts.Add(
-	BoolOption('DEBUG', 'Set to include debug symbols and output', 0),
-	BoolOption('SAMPLES', 'Set to build sample programs', 0)
+	BoolOption('DEBUG', 'Set to include debug symbols and output', False),
+	BoolOption('SAMPLES', 'Set to build sample programs', False),
+	BoolOption('RELEASE', 'Set this option only if you are preparing a release', False)
 	)
 
 # The default environment.
