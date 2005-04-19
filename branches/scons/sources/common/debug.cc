@@ -4,10 +4,11 @@
 //
 // $Id$
 
+#if defined(_DEBUG) && defined(HAVE_flog)
+
+#include <flog.h>
 #include <stdio.h>
 #include "debug.h"
-
-#if defined(_DEBUG) && defined(HAVE_flog)
 
 static flogdef_t logs[] =
 {
@@ -27,7 +28,7 @@ flog_t flog = 0;
 void debug_init(void)
 {
 	if ((flog = flog_init(logs, sizeof(logs) / sizeof(logs[0]))) != 0)
-		flog_writef(flog, 0, "debugging initialized");
+		flog_write(flog, 0, "debugging initialized");
 	else {
 		fprintf(stderr, "could not open librascal.log\n");
 	}

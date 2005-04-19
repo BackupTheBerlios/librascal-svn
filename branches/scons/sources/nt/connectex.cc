@@ -183,7 +183,7 @@ bool iocp::connect(SOCKET &s, const sock_t &peer, OVERLAPPED *olp)
 			return false;
 	}
 
-	if (WSAEventSelect(s, Job, FD_CONNECT))
+	if (WSAEventSelect(s, Job.get_wsa(), FD_CONNECT))
 		return false;
 
 	if (WSAConnect(s, reinterpret_cast<struct sockaddr *>(&sa), sizeof(sa), NULL, NULL, NULL, NULL) && WSAGetLastError() != WSAEWOULDBLOCK)

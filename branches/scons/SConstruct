@@ -50,7 +50,7 @@ opts.Add(
 	)
 
 # The default environment.
-env = Environment(options = opts, tools = ['mingw'])
+env = Environment(options = opts)
 env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS', ('funs', 'rsample')], LIBPATH = output_dir)
 
 # Check the system configuration if we're not cleaning up.
@@ -81,6 +81,15 @@ else:
 		if not conf.CheckFunc('snprintf'):
 			if conf.CheckFunc('_snprintf'):
 				conf.env.Append(CPPDEFINES = 'snprintf=_snprintf')
+			else:
+				print 'The snprintf() function is not avaialble (very unusual).'
+				Exit(1)
+		if not conf.CheckFunc('vsnprintf'):
+			if conf.CheckFunc('_vsnprintf'):
+				conf.env.Append(CPPDEFINES = 'vsnprintf=_vsnprintf')
+			else:
+				print 'The vsnprintf() function is not avaialble (very unusual).'
+				Exit(1)
 		if conf.CheckFunc('getopt'):
 			conf.env.Append(CPPDEFINES = 'HAVE_getopt')
 	else:
@@ -106,7 +115,17 @@ else:
 if env['DEBUG'] == 1:
 	print '*** DEBUG BUILD ***'
 	env.Append(CPPDEFINES = '_DEBUG')
-	env.Append(CCFLAGS = '-g -O0')
+	if env['CC'] == 'cl':
+		env.Append(CCFLAGS = '/Od /GX /EHsc /MDd /Z7')
+		env.Append(LINKFLAGS = '/DEBUG /OPT:NOICF /OPT:NOREF')
+	elif env['CC'] == 'gcc':
+		env.Append(CCFLAGS = '-g -O0')
+
+# Adapt to a release build.
+else:
+	if env['CC'] == 'cl':
+		env.Append(CCFLAGS = '/Ox /G5 /GF /Gy /MD')
+		env.Append(LINKFLAGS = '/RELEASE /OPT:REF /OPT:ICF')
 
 opts.Save('config.options', env)
 Export('env', 'fnd')

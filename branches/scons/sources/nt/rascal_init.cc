@@ -24,7 +24,7 @@ static void ns_initres_get(IP_ADDR_STRING *ias)
 	for (tmp = ias; tmp != NULL && nscount != dimof(nslist); tmp = tmp->Next, ++nscount) {
 		if (rascal_aton(tmp->IpAddress.String, &nslist[nscount].addr)) {
 			nslist[nscount].port = 53;
-			debug((flog, rl_resolver, "resolver %02u of %02u: %s", nsidx, nscount, tmp->IpAddress.String));
+			debug((flog, rl_resolver, "resolver %02u: %s", nscount, tmp->IpAddress.String));
 		}
 	}
 

@@ -22,7 +22,7 @@ enum raloglev
 
 #if defined(_DEBUG) && defined(HAVE_flog)
 # include <flog.h>
-# define debug(str) flog_writef str
+# define debug(str) flog_write str
 extern flog_t flog;
 void debug_init(void);
 #else

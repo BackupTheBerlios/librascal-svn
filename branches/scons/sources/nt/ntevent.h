@@ -15,7 +15,7 @@ class ntevent
 {
 	HANDLE hEvent;
 public:
-	ntevent() { hEvent = CreateEvent(NULL, TRUE, FALSE, NULL); }
+	ntevent() { hEvent = CreateEvent(NULL, FALSE, FALSE, NULL); }
 	~ntevent() { close(); }
 	void close() { if (hEvent != NULL) { CloseHandle(hEvent); hEvent = NULL; } }
 	void set() { SetEvent(hEvent); }
