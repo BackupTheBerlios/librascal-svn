@@ -7,3 +7,5 @@ senv.Append(CPPPATH = ['../common/util', '..'], LIBPATH = '#/../../' + env['LIBA
 src = fnd.listFiles(['../common/util'], r'^.*(\.cc)$')
 
 senv.Program('raconn', src + ['01-raconn/raconn.cc'])
+senv.Program('raconns', src + ['02-raconns/test-02.cc'])
+senv.Program('rahost', src + ['04-rahost/rahost.cc'])

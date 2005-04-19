@@ -13,12 +13,11 @@
 # include <io.h>
 # include <windows.h>
 #endif
-#include <faeutil/mutex.h>
-#include <faeutil/sem.h>
-#include "../../rascal.h"
+#include "mutex.h"
+#include "sem.h"
+#include "rascal.h"
 
 using namespace rascal;
-using namespace faeutil;
 
 #ifndef dimof
 # define dimof(arr) (sizeof(arr) / sizeof(arr[0]))
@@ -91,7 +90,7 @@ static bool __rascall filter(void *, const sock_t *)
 
 int main(int argc, char *argv[])
 {
-	int proto = proto_tcp;
+	const char *proto = "tcp";
 	const char *service = "irc", *addr = "localhost";
 
 	while (++argv, --argc) {
@@ -104,14 +103,7 @@ int main(int argc, char *argv[])
 			++argv, --argc;
 		}
 		else if (strcmp(*argv, "-proto") == 0 && argc > 1) {
-			if (strcmp(argv[1], "tcp") == 0)
-				proto = proto_tcp;
-			else if (strcmp(argv[1], "udp") == 0)
-				proto = proto_udp;
-			else {
-				fprintf(stderr, "bad protocol name: %s.\n", argv[1]);
-				return 1;
-			}
+			proto = argv[1];
 			++argv, --argc;
 		}
 		else {
@@ -131,7 +123,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Connection request failed: %08x, %s.\n", rid, errmsg(rid).c_str());
 		return 1;
 	} else {
-		fprintf(stdout, "Request to connect to service %s (%s over %s) schedulled, waiting (rid: %x).\n", addr, service, proto == proto_tcp ? "tcp" : "udp", rid);
+		fprintf(stdout, "Request to connect to service %s (%s over %s) schedulled, waiting (rid: %x).\n", addr, service, proto, rid);
 	}
 
 	hFinished.wait();

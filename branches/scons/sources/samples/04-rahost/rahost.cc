@@ -4,26 +4,23 @@
 //
 // $Id$
 
-#define RASCAL_HELPERS
-
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #ifndef _WIN32
 # include <unistd.h>
 #endif
-#include <faeutil/faeutil.h>
-#include <faeutil/sem.h>
-#include <faeutil/time.h>
-#include "../../rascal.h"
+#include "ftspec.h"
+#include "sem.h"
+#include "rascal.h"
 
 using namespace rascal;
-using namespace faeutil;
 
 struct srv_tmp
 {
 	const char *srv;
-	int proto;
+	const char *proto;
 	const char *host;
 	unsigned int count;
 };
@@ -75,7 +72,7 @@ static bool __rascall filter(void *context, const sock_t *addr)
 	struct srv_tmp *tmp = reinterpret_cast<struct srv_tmp *>(context);
 
 	if (quiet == false && tmp->count == 0)
-		fprintf(stdout, "Service %s (protocol %s) for domain %s is server by:\n", tmp->srv, tmp->proto == proto_tcp ? "tcp" : "udp", tmp->host);
+		fprintf(stdout, "Service %s (protocol %s) for domain %s is server by:\n", tmp->srv, tmp->proto, tmp->host);
 
 	fprintf(stdout, " %02u. %s.\n", ++(tmp->count), ntoa(*addr).c_str());
 	return false;
@@ -122,8 +119,8 @@ int main(int argc, char * const * argv)
 	bool single = false;
 	const char *host = NULL, *svc = NULL;
 	long int retry = -1, timeout = -1;
-	int proto = proto_tcp;
-	faeutil::timespec now;
+	const char *proto = "tcp";
+	ftspec now;
 
 	while ((ch = getopt(argc, argv, "n:p:qr:s:St:v")) != -1) {
 		switch (ch) {
@@ -134,14 +131,7 @@ int main(int argc, char * const * argv)
 				sock.port = 53;
 			break;
 		case 'p':
-			if (strcmp(optarg, "tcp") == 0)
-				proto = proto_tcp;
-			else if (strcmp(optarg, "udp") == 0)
-				proto = proto_udp;
-			else {
-				fprintf(stderr, "Unknown protocol: %s, must be either tcp or udp.\n", optarg);
-				return 1;
-			}
+			proto = optarg;
 			break;
 		case 'q':
 			quiet = true;
@@ -159,7 +149,7 @@ int main(int argc, char * const * argv)
 			timeout = atoi(optarg) * 1000;
 			break;
 		case 'v':
-			fprintf(stdout, "rahost version %d.%d.%d.%d\n", VERSION_NUM);
+			fprintf(stdout, "rahost version %s\n", VERSION);
 			return 0;
 		default:
 			return usage();
@@ -208,7 +198,7 @@ int main(int argc, char * const * argv)
 		return rafail(rc, "waiting on request");
 
 	if (!quiet) {
-		fprintf(stdout, "Done in %u msec.\n", (faeutil::timespec() - now).mseconds());
+		fprintf(stdout, "Done in %u msec.\n", (ftspec() - now).mseconds());
 	}
 
 	return 0;
