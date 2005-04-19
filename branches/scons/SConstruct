@@ -2,11 +2,11 @@
 # $Id$
 # vim:ts=2:sts=2:sw=2:noet:nocindent:syntax=python
 
+import os
 import re
 
 # A function to list files in a directory.
-def listFiles(at, r):
-	import os
+def listFilesW(at, r):
 	for location in at:
 		for file in os.listdir(location):
 			fname = os.path.join(location, file)
@@ -15,14 +15,19 @@ def listFiles(at, r):
 					yield fname
 			elif os.path.isdir(fname):
 				if not fname == '.svn':
-					for more in listFiles([fname], r):
+					for more in listFilesW([fname], r):
 						yield more
+
+def listFiles(at, r):
+	l = list(listFilesW(at, r))
+	l.sort()
+	return l
 
 # Version number.
 version = '1.0'
 
 # The directory in which built files are stored.
-output_dir = 'librascal-' + version
+output_dir = 'build'
 
 # Check the system configuration.
 env = Environment()
@@ -31,6 +36,7 @@ if not conf.CheckFunc('strlcpy'):
 	print 'Could not find strlcpy(), using local version.'
 	conf.env.Append('-Dstrlcpy=strlcpy_local')
 if not conf.CheckLib('pthread'):
+	print 'You must have the pthread library installed.'
 	Exit(1)
 env = conf.Finish()
 
@@ -38,23 +44,19 @@ env = conf.Finish()
 senv = env.Copy(CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = ['RASCAL_HELPERS', ('funs', 'rsample')], LIBS = 'rascal', LIBPATH = output_dir)
 
 # Source files.
-srcUtil = list(listFiles(['sources/common/util'], re.compile(r'^.*(\.cc)$')))
-srcCommon = list(listFiles(['sources/common'], re.compile(r'^.*(\.cc)$')))
-srcBSD = list(listFiles(['sources/bsd'], re.compile(r'^.*(\.cc)$')))
-srcNT = list(listFiles(['sources/nt'], re.compile(r'^.*(\.cc|\.rc)$')))
-srcPlist = list(listFiles(['.'], re.compile(r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$')))
+srcUtil = listFiles(['sources/common/util'], re.compile(r'^.*(\.cc)$'))
 
 # Platform-dependent code.
 if env['PLATFORM'] == 'win32':
-	srcLib = srcCommon + srcNT
+	srcLib = listFiles(['sources/common', 'sources/nt'], re.compile(r'^.*(\.cc)$'))
 else:
-	srcLib = srcCommon + srcBSD
+	srcLib = listFiles(['sources/common', 'sources/bsd'], re.compile(r'^.*(\.cc)$'))
 
 # Build the main library.
-lib = env.SharedLibrary(output_dir + '/rascal', srcLib, CCFLAGS = '-DBUILD_RASCAL')
+env.SharedLibrary(os.path.join(output_dir, 'rascal'), srcLib, CCFLAGS = '-DBUILD_RASCAL')
 
 # Build the samples.
-sample01 = senv.Program(output_dir + '/raconn', srcUtil + ['sources/samples/01-raconn/raconn.cc'])
+senv.Program(os.path.join(output_dir, 'raconn'), srcUtil + ['sources/samples/01-raconn/raconn.cc'])
 
 # Build a source tarball.
-Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', srcPlist)
+Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', listFiles(['.'], re.compile(r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$')))
