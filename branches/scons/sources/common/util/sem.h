@@ -14,6 +14,8 @@
 
 #include "mutex.h"
 
+namespace funs {
+
 class ftspec;
 
 // The `sem' class is a stand-alone full-featured semaphore,
@@ -48,5 +50,9 @@ public:
 	bool broadcast() { return seml::broadcast(); }
 	bool post() { return seml::post(); }
 };
+
+}
+
+using namespace funs;
 
 #endif // __librascal_common_util_sem_h

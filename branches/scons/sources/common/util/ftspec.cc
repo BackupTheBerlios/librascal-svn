@@ -4,6 +4,8 @@
 
 #include "ftspec.h"
 
+namespace funs {
+
 ftspec::ftspec(unsigned int _msec)
 {
 	if (_msec == ~0U)
@@ -105,4 +107,6 @@ ftspec ftspec::operator + (unsigned int _msec)
 unsigned int ftspec::mseconds()
 {
 	return sec * 1000 + msec;
+}
+
 }

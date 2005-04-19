@@ -6,6 +6,8 @@
 #include <time.h>
 #include "random.h"
 
+namespace funs {
+
 void faeutil_srandom(void)
 {
 #ifdef HAVE_arc4random
@@ -24,4 +26,6 @@ unsigned int faeutil_random(unsigned int range)
 	double tmp = (double)rand() / (double)RAND_MAX;
 	return (unsigned int)((double)range * tmp);
 #endif
+}
+
 }

@@ -10,6 +10,8 @@
 # include <sys/time.h>
 #endif
 
+namespace funs {
+
 void gettime(unsigned int *sec, unsigned int *msec)
 {
 #ifdef _WIN32
@@ -24,4 +26,6 @@ void gettime(unsigned int *sec, unsigned int *msec)
 	*sec = tv.tv_sec;
 	*msec = tv.tv_usec / 1000;
 #endif
+}
+
 }

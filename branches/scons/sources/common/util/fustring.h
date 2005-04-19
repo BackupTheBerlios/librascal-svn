@@ -12,6 +12,8 @@
 
 #include <stddef.h> /* for size_t */
 
+namespace funs {
+
 unsigned int atou(const char *);
 void strlcpy_local(char *, const char *, size_t);
 void strlcat_local(char *, const char *, size_t);
@@ -21,5 +23,9 @@ int strisdigit(const char *);
 void strtoupper(char *);
 char * strtok_r(char *src, const char *sep, char **state);
 char * strtok(char *src, const char *sep);
+
+}
+
+using namespace funs;
 
 #endif /* __faeutil_string_h */

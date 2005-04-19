@@ -4,6 +4,8 @@
 
 #include "fustring.h"
 
+namespace funs {
+
 void strlcpy_local(char *dst, const char *src, size_t size)
 {
 	while (size != 0 && *src != '\0') {
@@ -15,4 +17,6 @@ void strlcpy_local(char *dst, const char *src, size_t size)
 		--dst;
 
 	*dst = '\0';
+}
+
 }

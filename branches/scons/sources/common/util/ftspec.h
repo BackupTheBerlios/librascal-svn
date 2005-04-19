@@ -7,6 +7,8 @@
 #ifndef __librascal_common_util_ftspec_h
 #define __librascal_common_util_ftspec_h
 
+namespace funs {
+
 class ftspec
 {
 public:
@@ -26,5 +28,9 @@ public:
 };
 
 void gettime(unsigned int *sec, unsigned int *msec);
+
+}
+
+using namespace funs;
 
 #endif // __librascal_common_util_ftspec_h

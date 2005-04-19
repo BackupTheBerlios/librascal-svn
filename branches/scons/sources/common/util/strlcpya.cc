@@ -2,9 +2,10 @@
 // Copyright (c) 2002-2004 hex@faerion.oss and others.
 // $Id$
 
-#ifndef HAVE_strlcpya
 #include <stdarg.h>
 #include "string.h"
+
+namespace funs {
 
 void strlcpya(char *buf, size_t size, ...)
 {
@@ -26,4 +27,5 @@ void strlcpya(char *buf, size_t size, ...)
 
 	va_end(vl);
 }
-#endif
+
+}

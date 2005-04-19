@@ -9,6 +9,8 @@
 
 #include <pthread.h>
 
+namespace funs {
+
 class mutex
 {
 public:
@@ -41,5 +43,9 @@ public:
 	bool set(const void *arg);
 	void * get();
 };
+
+}
+
+using namespace funs;
 
 #endif // __librascal_common_util_mutex_h

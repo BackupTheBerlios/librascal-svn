@@ -11,6 +11,8 @@
 
 #include "mutex.h"
 
+namespace funs {
+
 // Paged and cached memory allocation class.
 class pageman {
 	// Thread locker.
@@ -72,5 +74,9 @@ public:
 };
 
 #endif // defined(BUILDING_SHARED_FAEUTIL)
+
+}
+
+using namespace funs;
 
 #endif // __librascal_common_util_memory_h
