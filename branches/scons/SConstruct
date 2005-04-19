@@ -40,6 +40,8 @@ if not conf.CheckLib('pthread'):
 	Exit(1)
 env = conf.Finish()
 
+env.Append(CPPDEFINES = [('VERSION', version)])
+
 # Special flags for building sample programs.
 senv = env.Copy(CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = ['RASCAL_HELPERS', ('funs', 'rsample')], LIBS = 'rascal', LIBPATH = output_dir)
 
