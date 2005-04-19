@@ -4,9 +4,8 @@
 //
 // $Id$
 
-#define RASCAL_HELPERS
-
 #include <ctype.h>
+#include <getopt.h>
 #ifdef _WIN32
 # include <malloc.h> // alloca()
 #endif
@@ -16,14 +15,12 @@
 #ifndef _WIN32
 # include <unistd.h>
 #else
+# include <windows.h>
 # define sleep(c) Sleep(c * 1000)
 #endif
-#include <faeutil/faeutil.h>
-#include <faeutil/time.h>
-#include "../../common/rascal.h"
+#include "rascal.h"
 
 using namespace rascal;
-using namespace faeutil;
 
 static int usage(void)
 {
@@ -72,19 +69,19 @@ int main(int argc, char * const * argv)
 	while ((ch = getopt(argc, argv, "d:h:n:p:v")) != -1) {
 		switch (ch) {
 		case 'd':
-			delay = faeutil_atou(optarg);
+			delay = atoi(optarg);
 			break;
 		case 'h':
 			rascal_aton(optarg, &sock.addr);
 			break;
 		case 'n':
-			count = faeutil_atou(optarg);
+			count = atoi(optarg);
 			break;
 		case 'p':
-			sock.port = faeutil_atou(optarg);
+			sock.port = atoi(optarg);
 			break;
 		case 'v':
-			fprintf(stdout, "ralc version %d.%d.%d.%d\n", VERSION_NUM);
+			fprintf(stdout, "ralc version %s\n", VERSION);
 			return 0;
 		default:
 			return usage();
@@ -109,7 +106,7 @@ int main(int argc, char * const * argv)
 			fprintf(stdout, "Connection to %s:%u failed.\n", ntoa(sock.addr).c_str(), sock.port);
 		}
 
-		usleep(delay * 1000);
+		sleep(delay);
 	}
 
 	fprintf(stdout, "Done.\n");
