@@ -4,10 +4,15 @@
 //
 // $Id$
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <faeutil/sem.h>
-#include <rascal.h>
+#ifdef _WIN32
+# include <windows.h>
+# define sleep(c) Sleep(c * 1000)
+#endif
+#include "sem.h"
+#include "rascal.h"
 
 static const char *usage_msg =
 	"Usage: rasvc -r ip-address port\n"
@@ -19,7 +24,7 @@ static const char *usage_msg =
 	"Send bug reports to <team@faerion.oss>\n"
 	;
 
-static faeutil::sem hsem;
+static sem hsem;
 
 static bool __rascall disp(rrid_t conn, const sock_t *peer, int event, void *)
 {
