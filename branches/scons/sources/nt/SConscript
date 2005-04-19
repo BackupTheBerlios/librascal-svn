@@ -1,0 +1,29 @@
+import os, re
+
+print 'Building the NT version.'
+
+# A function to list files in a directory.
+def listFiles(at, r):
+	nodes = []
+	for location in at:
+		for file in os.listdir(location):
+			fname = os.path.join(location, file)
+			if os.path.isfile(fname):
+				if r.match(file):
+					nodes.append(fname)
+			elif os.path.isdir(fname):
+				if not fname == '.svn':
+					for more in listFiles([fname], r):
+						nodes.append(more)
+	return nodes
+
+Import('env')
+
+env.Append(tools = ['mingw'], CPPDEFINES = ['BUILD_RASCAL'])
+objs = []
+
+for item in listFiles(['.', '../common'], re.compile(r'^.*(\.cc)$')):
+	fname, ext = os.path.splitext(item)
+	objs.append(env.SharedObject(fname + '.os', item))
+
+env.SharedLibrary('rascal', objs)

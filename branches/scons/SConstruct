@@ -78,20 +78,16 @@ else:
 		Exit(1)
 	env = conf.Finish()
 
-# Source files.
-srcUtil = listFiles(['sources/common/util'], re.compile(r'^.*(\.cc)$'))
+Export('env')
 
 # Platform-dependent code.
 if env['PLATFORM'] == 'win32':
-	srcLib = listFiles(['sources/common', 'sources/nt'], re.compile(r'^.*(\.cc)$'))
+	SConscript(os.path.join('sources', 'nt', 'SConscript'))
 else:
-	srcLib = listFiles(['sources/common', 'sources/bsd'], re.compile(r'^.*(\.cc)$'))
-
-# Build the main library.
-env.SharedLibrary(os.path.join(output_dir, 'rascal'), srcLib, CCFLAGS = '-DBUILD_RASCAL')
+	SConscript(os.path.join('sources', 'bsd', 'SConscript'))
 
 # Build the samples.
-# env.Program(os.path.join(output_dir, 'raconn'), srcUtil + ['sources/samples/01-raconn/raconn.cc'])
+SConscript(os.path.join('sources', 'samples', 'SConscript'))
 
 if env['PLATFORM'] != 'win32':
 	# Build a source tarball.
