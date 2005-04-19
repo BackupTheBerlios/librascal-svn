@@ -55,7 +55,7 @@ opts.Add(
 
 # The default environment.
 env = Environment(options = opts)
-env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS', ('funs', 'rsample')], LIBPATH = output_dir)
+env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS'], LIBPATH = output_dir)
 
 # Check the system configuration if we're not cleaning up.
 if env.GetOption('clean'):
@@ -66,6 +66,8 @@ else:
 	if not conf.CheckFunc('strlcpy'):
 		print 'Could not find strlcpy(), using local version.'
 		conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
+	if conf.CheckFunc('getopt'):
+		conf.env.Append(CPPDEFINES = 'HAVE_getopt')
 	if env['PLATFORM'] == 'win32':
 		conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
 		# Windows specific.
@@ -94,8 +96,6 @@ else:
 			else:
 				print 'The vsnprintf() function is not avaialble (very unusual).'
 				Exit(1)
-		if conf.CheckFunc('getopt'):
-			conf.env.Append(CPPDEFINES = 'HAVE_getopt')
 	else:
 		# POSIX specific.
 		if not conf.CheckLib('pthread'):

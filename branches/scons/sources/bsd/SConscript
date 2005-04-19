@@ -1,11 +1,12 @@
 import os
 Import('env', 'fnd')
 
-env.Append(CPPDEFINES = ['BUILD_RASCAL'], CPPPATH = '../common/util')
+envbsd = env.Copy()
+envbsd.Append(CPPDEFINES = ['BUILD_RASCAL', ('funs', 'librans')], CPPPATH = '../common/util')
 objs = []
 
 for item in fnd.listFiles(['.', '../common'], r'^.*(\.cc)$'):
 	fname, ext = os.path.splitext(item)
-	objs.append(env.SharedObject(fname + '.os', item))
+	objs.append(envbsd.SharedObject(fname + '.os', item))
 
-env.SharedLibrary('rascal', objs)
+envbsd.SharedLibrary('rascal', objs)

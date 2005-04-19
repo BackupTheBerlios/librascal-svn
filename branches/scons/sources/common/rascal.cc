@@ -4,6 +4,7 @@
 //
 // $Id$
 
+#include <string.h>
 #ifndef _WIN32
 # include <sys/types.h>
 # include <netinet/in.h>

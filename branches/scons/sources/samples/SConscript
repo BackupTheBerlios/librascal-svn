@@ -1,14 +1,18 @@
 import os
 Import('env', 'fnd')
 
-senv = env.Copy()
-senv.Append(CPPPATH = ['../common/util', '..'], LIBPATH = '#/../../' + env['LIBARCH'], LIBS = 'rascal')
+envsam = env.Copy()
+envsam.Append(CPPPATH = ['../common/util', '..'],
+	CPPDEFINES = [('funs', 'rasamples')],
+	LIBPATH = '#/../../' + env['LIBARCH'], LIBS = 'rascal')
 
 src = fnd.listFiles(['../common/util'], r'^.*(\.cc)$')
 
-senv.Program('raconn', src + ['01-raconn/raconn.cc'])
-senv.Program('raconns', src + ['02-raconns/test-02.cc'])
-senv.Program('rahost', src + ['04-rahost/rahost.cc'])
-senv.Program('raflood', src + ['05-raflood/raflood.cc'])
-senv.Program('ralc', src + ['06-ralc/ralc.cc'])
-senv.Program('rasvc', src + ['07-rasvc/rasvc.cc'])
+envsam.Program('raconn', src + ['01-raconn/raconn.cc'])
+envsam.Program('raconns', src + ['02-raconns/test-02.cc'])
+envsam.Program('rahost', src + ['04-rahost/rahost.cc'])
+envsam.Program('raflood', src + ['05-raflood/raflood.cc'])
+envsam.Program('ralc', src + ['06-ralc/ralc.cc'])
+envsam.Program('rasvc', src + ['07-rasvc/rasvc.cc'])
+
+# vim:ts=2:sts=2:sw=2:noet:syntax=python
