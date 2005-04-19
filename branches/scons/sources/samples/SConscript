@@ -1,1 +1,9 @@
-env = Environment()
+import os
+Import('env', 'fnd')
+
+senv = env.Copy()
+senv.Append(CPPPATH = ['../common/util', '..'], LIBPATH = '#/../../' + env['LIBARCH'], LIBS = 'rascal')
+
+src = fnd.listFiles(['../common/util'], r'^.*(\.cc)$')
+
+senv.Program('raconn', src + ['01-raconn/raconn.cc'])

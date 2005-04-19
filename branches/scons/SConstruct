@@ -5,25 +5,26 @@
 import os
 import re
 
-# A function to list files in a directory.
-def listFilesW(at, r):
-	nodes = []
-	for location in at:
-		for file in os.listdir(location):
-			fname = os.path.join(location, file)
-			if os.path.isfile(fname):
-				if r.match(file):
-					nodes.append(fname)
-			elif os.path.isdir(fname):
-				if not fname == '.svn':
-					for more in listFilesW([fname], r):
-						nodes.append(more)
-	return nodes
-
-def listFiles(at, r):
-	l = listFilesW(at, r)
-	l.sort()
-	return l
+class Finder:
+  # A function to list files in a directory.
+  def listFilesW(self, at, r):
+    nodes = []
+    for location in at:
+      for file in os.listdir(location):
+        fname = os.path.join(location, file)
+        if os.path.isfile(fname):
+          if r.match(file):
+            nodes.append(fname)
+        elif os.path.isdir(fname):
+          if not fname == '.svn':
+            for more in self.listFilesW([fname], r):
+              nodes.append(more)
+    return nodes
+  
+  def listFiles(self, at, r):
+    l = self.listFilesW(at, re.compile(r))
+    l.sort()
+    return l
 
 # Version number.
 version = '1.0'
@@ -39,11 +40,13 @@ The following options are available:
 # The directory in which built files are stored.
 output_dir = 'build'
 
+fnd = Finder()
+
 # The default environment.
 env = Environment()
 if env['PLATFORM'] == 'win32':
 	env = Environment(tools = ['mingw'])
-env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS', ('funs', 'rsample')], CPPPATH = ['sources', 'sources/common/util'], LIBPATH = output_dir)
+env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS', ('funs', 'rsample')], LIBPATH = output_dir)
 
 # Check the system configuration if we're not cleaning up.
 if env.GetOption('clean'):
@@ -78,17 +81,20 @@ else:
 		Exit(1)
 	env = conf.Finish()
 
-Export('env')
+Export('env', 'fnd')
 
 # Platform-dependent code.
 if env['PLATFORM'] == 'win32':
-	SConscript(os.path.join('sources', 'nt', 'SConscript'))
+	env['LIBARCH'] = 'nt'
 else:
-	SConscript(os.path.join('sources', 'bsd', 'SConscript'))
+	env['LIBARCH'] = 'bsd'
+
+# Build the library.
+SConscript(os.path.join('sources', env['LIBARCH'], 'SConscript'))
 
 # Build the samples.
-SConscript(os.path.join('sources', 'samples', 'SConscript'))
+SConscript('sources/samples/SConscript')
 
 if env['PLATFORM'] != 'win32':
 	# Build a source tarball.
-	Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', listFiles(['.'], re.compile(r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$')))
+	Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', fnd.listFiles(['.'], r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$'))
