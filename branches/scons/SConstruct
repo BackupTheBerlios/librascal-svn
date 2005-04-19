@@ -2,6 +2,22 @@
 # $Id$
 # vim:ts=2:sts=2:sw=2:noet:nocindent:syntax=python
 
+import re
+
+# A function to list files in a directory.
+def listFiles(at, r):
+	import os
+	for location in at:
+		for file in os.listdir(location):
+			fname = os.path.join(location, file)
+			if os.path.isfile(fname):
+				if r.match(file):
+					yield fname
+			elif os.path.isdir(fname):
+				if not fname == '.svn':
+					for more in listFiles([fname], r):
+						yield more
+
 # Version number.
 version = '1.0'
 
@@ -22,208 +38,23 @@ env = conf.Finish()
 senv = env.Copy(CPPPATH = ['sources', 'sources/common/util'], CPPDEFINES = ['RASCAL_HELPERS', ('funs', 'rsample')], LIBS = 'rascal', LIBPATH = output_dir)
 
 # Source files.
-util = Split("""
-	sources/common/util/ftspec.cc
-	sources/common/util/gettime.cc
-	sources/common/util/memory.cc
-	sources/common/util/mutex.cc
-	sources/common/util/random.cc
-	sources/common/util/sem.cc
-	sources/common/util/strlcpya.cc
-	""")
-common = Split("""
-	sources/common/datachain.cc
-	sources/common/datachainitem.cc
-	sources/common/debug.cc
-	sources/common/object.cc
-	sources/common/packetchain.cc
-	sources/common/rascal.cc
-	sources/common/rascal_accept_service.cc
-	sources/common/rascal_aton.cc
-	sources/common/rascal_cancel.cc
-	sources/common/rascal_connect.cc
-	sources/common/rascal_connect_service.cc
-	sources/common/rascal_dumpfile.cc
-	sources/common/rascal_get_errmsg.cc
-	sources/common/rascal_ntoa.cc
-	sources/common/rascal_options.cc
-	sources/common/rascal_wait.cc
-	sources/common/resolver/header.cc
-	sources/common/resolver/monitor.cc
-	sources/common/resolver/rascal_getaddr.cc
-	sources/common/resolver/rascal_gethost.cc
-	sources/common/resolver/rascal_getsrv.cc
-	sources/common/resolver/rascal_set_nameserver.cc
-	sources/common/resolver/request.cc
-	sources/common/resolver/resolver.cc
-	""")
-bsd = Split("""
-	sources/bsd/connection.cc
-	sources/bsd/connection_dg.cc
-	sources/bsd/connection_in.cc
-	sources/bsd/rascal_accept.cc
-	sources/bsd/rascal_connect.cc
-	sources/bsd/rascal_get_rq_size.cc
-	sources/bsd/rascal_get_sq_size.cc
-	sources/bsd/rascal_init.cc
-	sources/bsd/rascal_read.cc
-	sources/bsd/rascal_set_context.cc
-	sources/bsd/rascal_set_dispatcher.cc
-	sources/bsd/rascal_shrink.cc
-	sources/bsd/rascal_work.cc
-	sources/bsd/rascal_write.cc
-	""")
-nt = Split("""
-	sources/nt/connectex.cc
-	sources/nt/connection.cc
-	sources/nt/connection_dg.cc
-	sources/nt/connection_st.cc
-	sources/nt/iocp.cc
-	sources/nt/oaccept.cc
-	sources/nt/oconnect.cc
-	sources/nt/oreader.cc
-	sources/nt/oreader_dg.cc
-	sources/nt/overlapped.cc
-	sources/nt/owriter.cc
-	sources/nt/owriter_dg.cc
-	sources/nt/rascal.cc
-	sources/nt/rascal_accept.cc
-	sources/nt/rascal_connect.cc
-	sources/nt/rascal_get_rq_size.cc
-	sources/nt/rascal_get_sq_size.cc
-	sources/nt/rascal_init.cc
-	sources/nt/rascal_read.cc
-	sources/nt/rascal_set_context.cc
-	sources/nt/rascal_set_dispatcher.cc
-	sources/nt/rascal_shrink.cc
-	sources/nt/rascal_write.cc
-	sources/nt/rascal.rc
-	""")
+srcUtil = list(listFiles(['sources/common/util'], re.compile(r'^.*(\.cc)$')))
+srcCommon = list(listFiles(['sources/common'], re.compile(r'^.*(\.cc)$')))
+srcBSD = list(listFiles(['sources/bsd'], re.compile(r'^.*(\.cc)$')))
+srcNT = list(listFiles(['sources/nt'], re.compile(r'^.*(\.cc|\.rc)$')))
+srcPlist = list(listFiles(['.'], re.compile(r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$')))
 
 # Platform-dependent code.
 if env['PLATFORM'] == 'win32':
-	libsrc = util + common + nt
+	srcLib = srcCommon + srcNT
 else:
-	libsrc = util + common + bsd
-
-# The list of files to include in a source package.
-# This really has to be collected automatically.
-srcplist = Split("""
-	LICENSE
-	SConstruct
-	docbook/rascal.docbook
-	docbook/rascal.dtd
-	docbook/ch.intro.docbook
-	docbook/app.intref.docbook
-	docbook/app.funcref.docbook
-	docbook/ch.impl.docbook
-	docbook/app.typeref.docbook
-	docbook/ch.todo.docbook
-	sources/nt/connection_st.cc
-	sources/nt/oreader_dg.cc
-	sources/nt/owriter.cc
-	sources/nt/iocp.h
-	sources/nt/connection.cc
-	sources/nt/rascal_read.cc
-	sources/nt/rascal_get_rq_size.cc
-	sources/nt/overlapped.cc
-	sources/nt/connection.h
-	sources/nt/oaccept.cc
-	sources/nt/rascal_get_sq_size.cc
-	sources/nt/owriter_dg.cc
-	sources/nt/rascal.cc
-	sources/nt/connection_dg.cc
-	sources/nt/connection_st.h
-	sources/nt/oconnect.cc
-	sources/nt/rascal_set_context.cc
-	sources/nt/connection_dg.h
-	sources/nt/rascal_connect.cc
-	sources/nt/rascal_write.cc
-	sources/nt/oreader.cc
-	sources/nt/rascal_shrink.cc
-	sources/nt/rascal_accept.cc
-	sources/nt/connectex.cc
-	sources/nt/ntevent.h
-	sources/nt/iocp.cc
-	sources/nt/rascal_set_dispatcher.cc
-	sources/nt/rascal_init.cc
-	sources/nt/rascal.rc
-	sources/samples/04-rahost/rahost.cc
-	sources/samples/07-rasvc/rasvc.cc
-	sources/samples/02-raconns/test-02.cc
-	sources/samples/06-ralc/ralc.cc
-	sources/samples/03-radnsperf/test-03.cc
-	sources/samples/05-raflood/raflood.cc
-	sources/samples/01-raconn/raconn.cc
-	sources/bsd/connection_dg.cc
-	sources/bsd/connection.cc
-	sources/bsd/rascal_read.cc
-	sources/bsd/rascal_get_rq_size.cc
-	sources/bsd/connection.h
-	sources/bsd/rascal_get_sq_size.cc
-	sources/bsd/rascal_work.cc
-	sources/bsd/rascal_set_context.cc
-	sources/bsd/rascal_connect.cc
-	sources/bsd/rascal_write.cc
-	sources/bsd/rascal_shrink.cc
-	sources/bsd/rascal_init.cc
-	sources/bsd/rascal_accept.cc
-	sources/bsd/connection_in.cc
-	sources/bsd/rascal_set_dispatcher.cc
-	sources/common/resolver/rascal_getsrv.cc
-	sources/common/resolver/rascal_getaddr.cc
-	sources/common/resolver/resolver.cc
-	sources/common/resolver/rascal_gethost.cc
-	sources/common/resolver/resolver.h
-	sources/common/resolver/monitor.cc
-	sources/common/resolver/header.cc
-	sources/common/resolver/request.cc
-	sources/common/resolver/rascal_set_nameserver.cc
-	sources/common/util/gettime.cc
-	sources/common/util/strlcpy.cc
-	sources/common/util/strlcpya.cc
-	sources/common/util/mutex.cc
-	sources/common/util/mutex.h
-	sources/common/util/memory.cc
-	sources/common/util/memory.h
-	sources/common/util/list.h
-	sources/common/util/random.cc
-	sources/common/util/random.h
-	sources/common/util/ftspec.cc
-	sources/common/util/sem.cc
-	sources/common/util/stock.h
-	sources/common/util/sem.h
-	sources/common/util/ftspec.h
-	sources/common/util/fustring.h
-	sources/common/rascal_get_errmsg.cc
-	sources/common/datachainitem.cc
-	sources/common/rascal.cc
-	sources/common/rascal_connect_service.cc
-	sources/common/object.cc
-	sources/common/object.h
-	sources/common/rascal.rc
-	sources/common/rascal_accept_service.cc
-	sources/common/rascal_cancel.cc
-	sources/common/packetchain.cc
-	sources/common/datachain.cc
-	sources/common/rascal_connect.cc
-	sources/common/datachain.h
-	sources/common/rascal_options.cc
-	sources/common/rascal_aton.cc
-	sources/common/rascal_dumpfile.cc
-	sources/common/debug.cc
-	sources/common/rascal_ntoa.cc
-	sources/common/debug.h
-	sources/common/rascal_wait.cc
-	sources/common/common.h
-	sources/rascal.h
-	""")
+	srcLib = srcCommon + srcBSD
 
 # Build the main library.
-lib = env.SharedLibrary(output_dir + '/rascal', libsrc, CCFLAGS = '-DBUILD_RASCAL')
+lib = env.SharedLibrary(output_dir + '/rascal', srcLib, CCFLAGS = '-DBUILD_RASCAL')
 
 # Build the samples.
-sample01 = senv.Program(output_dir + '/raconn', util + ['sources/samples/01-raconn/raconn.cc'])
+sample01 = senv.Program(output_dir + '/raconn', srcUtil + ['sources/samples/01-raconn/raconn.cc'])
 
 # Build a source tarball.
-Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', srcplist)
+Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', srcPlist)
