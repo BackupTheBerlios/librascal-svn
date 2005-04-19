@@ -6,7 +6,7 @@
 
 #include "resolver.h"
 
-rrid_t rascal_set_nameserver(const sock_t *peer, unsigned int count)
+RASCAL_API(rrid_t) rascal_set_nameserver(const sock_t *peer, unsigned int count)
 {
 	if (count < 1)
 		return REC_INVALID_ARGUMENT;

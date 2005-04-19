@@ -1,7 +1,7 @@
 import os
 Import('env', 'fnd')
 
-env.Append(tools = ['mingw'], CPPDEFINES = ['BUILD_RASCAL'], CPPPATH = ['../common/util'])
+env.Append(CPPDEFINES = ['BUILD_RASCAL'], CPPPATH = ['../common/util'])
 objs = []
 
 for item in fnd.listFiles(['.', '../common'], r'^.*(\.cc)$'):

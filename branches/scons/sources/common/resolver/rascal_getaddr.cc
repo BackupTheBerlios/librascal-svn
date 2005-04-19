@@ -85,7 +85,7 @@ bool getaddr::dump(char *&dst, unsigned int &size)
 }
 
 
-extern "C" rrid_t rascal_getaddr(const char *host, rascal_getaddr_callback cb, void *context)
+RASCAL_API(rrid_t) rascal_getaddr(const char *host, rascal_getaddr_callback cb, void *context)
 {
 	rrid_t rid;
 	new getaddr(host, cb, context, rid);

@@ -18,7 +18,7 @@ static struct option {
 };
 
 
-rrid_t rascal_set_option(unsigned int optid, long int value, long int *old_value)
+RASCAL_API(rrid_t) rascal_set_option(unsigned int optid, long int value, long int *old_value)
 {
 	if (optid >= dimof(options))
 		return REC_INVALID_ARGUMENT;
@@ -41,7 +41,7 @@ rrid_t rascal_set_option(unsigned int optid, long int value, long int *old_value
 }
 
 
-rrid_t rascal_get_option(unsigned int optid, long int *value)
+RASCAL_API(rrid_t) rascal_get_option(unsigned int optid, long int *value)
 {
 	if (optid >= dimof(options))
 		return REC_INVALID_ARGUMENT;

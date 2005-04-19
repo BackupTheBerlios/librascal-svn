@@ -7,7 +7,7 @@
 #include "connection.h"
 #include "../common/debug.h"
 
-rrid_t rascal_write(rrid_t rid, const char *at, unsigned int size)
+RASCAL_API(rrid_t) rascal_write(rrid_t rid, const char *at, unsigned int size)
 {
 	pobject<connection> tmp(rid);
 

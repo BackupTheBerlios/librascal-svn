@@ -4,15 +4,15 @@
 //
 // $Id$
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef _WIN32
 # include <windows.h>
 # define sleep(c) Sleep(c * 1000)
 #endif
-#include "sem.h"
+#include "fugetopt.h"
 #include "rascal.h"
+#include "sem.h"
 
 static const char *usage_msg =
 	"Usage: rasvc -r ip-address port\n"

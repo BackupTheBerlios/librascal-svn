@@ -44,8 +44,6 @@ fnd = Finder()
 
 # The default environment.
 env = Environment()
-if env['PLATFORM'] == 'win32':
-	env = Environment(tools = ['mingw'])
 env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS', ('funs', 'rsample')], LIBPATH = output_dir)
 
 # Check the system configuration if we're not cleaning up.
@@ -58,6 +56,7 @@ else:
 		print 'Could not find strlcpy(), using local version.'
 		conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
 	if env['PLATFORM'] == 'win32':
+		conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
 		# Windows specific.
 		if not conf.CheckLib('ws2_32'):
 			print 'The winsock-2 library is not available (very unusual).'
@@ -68,9 +67,15 @@ else:
 		if not conf.CheckLib('iphlpapi'):
 			print 'The iphlpapi library is required (usually available on nt).'
 			Exit(1)
+		conf.CheckLib('user32')
 		if not conf.CheckLib(['pthread', 'pthreadGC', 'pthreadVC']):
 			print 'You must have the pthread library installed.'
 			Exit(1)
+		if not conf.CheckFunc('snprintf'):
+			if conf.CheckFunc('_snprintf'):
+				conf.env.Append(CPPDEFINES = 'snprintf=_snprintf')
+		if conf.CheckFunc('getopt'):
+			conf.env.Append(CPPDEFINES = 'HAVE_getopt')
 	else:
 		# POSIX specific.
 		if not conf.CheckLib('pthread'):

@@ -62,7 +62,7 @@ static bool __rascall ris_disp(rrid_t, const sock_t *, int, void *context)
 	return false;
 }
 
-rrid_t rascal_accept_service(const char *name, const char *proto, const char *domain, rascal_dispatcher disp, void *context)
+RASCAL_API(rrid_t) rascal_accept_service(const char *name, const char *proto, const char *domain, rascal_dispatcher disp, void *context)
 {
 	rrid_t rid;
 	ris_data *ris;

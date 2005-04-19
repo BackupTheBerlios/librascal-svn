@@ -7,7 +7,7 @@
 #include "object.h"
 #include "debug.h"
 
-rrid_t rascal_cancel(rrid_t rid)
+RASCAL_API(rrid_t) rascal_cancel(rrid_t rid)
 {
 	pobject<> tmp(rid);
 

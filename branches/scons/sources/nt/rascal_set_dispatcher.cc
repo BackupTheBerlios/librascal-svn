@@ -7,7 +7,7 @@
 #include "connection.h"
 #include "../common/debug.h"
 
-rrid_t rascal_set_dispatcher(rrid_t rid, rascal_dispatcher disp)
+RASCAL_API(rrid_t) rascal_set_dispatcher(rrid_t rid, rascal_dispatcher disp)
 {
 	pobject<connection> tmp(rid);
 

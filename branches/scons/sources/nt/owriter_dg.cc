@@ -69,7 +69,7 @@ void owriter_dg::on_event(unsigned int, bool)
 
 	get_peer().put(sa);
 
-	if (WSASendTo(get_socket(), &buf, 1, &dummy, 0, &sa, sizeof(sa), get_base(), callback) != SOCKET_ERROR || WSAGetLastError() == WSA_IO_PENDING) {
+	if (WSASendTo(get_socket(), &buf, 1, &dummy, 0, &sa, sizeof(sa), reinterpret_cast<LPWSAOVERLAPPED>(get_base()), callback) != SOCKET_ERROR || WSAGetLastError() == WSA_IO_PENDING) {
 #if defined(DUMP_PACKETS)
 		static unsigned int lastid = 0;
 		rascal_dumpfile(true, info().data, info().length, "resolver-packet-%05u.w", ++lastid);

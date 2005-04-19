@@ -31,7 +31,7 @@ void oreader_dg::on_event(unsigned int, bool)
 
 	info().from_length = sizeof(info().from_addr);
 
-	if (WSARecvFrom(get_socket(), &buf, 1, &dummy, &dummy, &info().from_addr, &info().from_length, get_base(), oreader_dg::callback) != SOCKET_ERROR || WSAGetLastError() == WSA_IO_PENDING) {
+	if (WSARecvFrom(get_socket(), &buf, 1, &dummy, &dummy, &info().from_addr, &info().from_length, reinterpret_cast<LPWSAOVERLAPPED>(get_base()), oreader_dg::callback) != SOCKET_ERROR || WSAGetLastError() == WSA_IO_PENDING) {
 		lma = true;
 		return;
 	}

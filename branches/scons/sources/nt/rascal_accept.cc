@@ -7,7 +7,7 @@
 #include "connection_st.h"
 #include "../common/debug.h"
 
-rrid_t rascal_accept(const sock_t *peer, rascal_dispatcher disp, void *context)
+RASCAL_API(rrid_t) rascal_accept(const sock_t *peer, rascal_dispatcher disp, void *context)
 {
 	rrid_t rc;
 	connection_st *tmp = new connection_st(disp, context);

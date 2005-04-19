@@ -8,7 +8,7 @@
 #include "common.h"
 #include "debug.h"
 
-rrid_t rascal_connect(const sock_t *target, rascal_dispatcher disp, void *context, const char *proto)
+RASCAL_API(rrid_t) rascal_connect(const sock_t *target, rascal_dispatcher disp, void *context, const char *proto)
 {
 	return rascal_connect_ex(target, disp, context, proto);
 }

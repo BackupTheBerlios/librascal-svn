@@ -4,7 +4,6 @@
 //
 // $Id$
 
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,8 +11,9 @@
 # include <unistd.h>
 #endif
 #include "ftspec.h"
-#include "sem.h"
+#include "fugetopt.h"
 #include "rascal.h"
+#include "sem.h"
 
 using namespace rascal;
 

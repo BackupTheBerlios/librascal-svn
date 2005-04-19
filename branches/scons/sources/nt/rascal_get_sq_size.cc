@@ -6,7 +6,7 @@
 
 #include "connection.h"
 
-rrid_t rascal_get_sq_size(rrid_t rid, unsigned int *size)
+RASCAL_API(rrid_t) rascal_get_sq_size(rrid_t rid, unsigned int *size)
 {
 	pobject<connection> tmp(rid);
 

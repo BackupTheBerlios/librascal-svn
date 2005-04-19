@@ -14,8 +14,8 @@
 # include <windows.h>
 #endif
 #include "mutex.h"
-#include "sem.h"
 #include "rascal.h"
+#include "sem.h"
 
 using namespace rascal;
 

@@ -72,7 +72,7 @@ static void get_os_errmsg(rrid_t rid, char *dst, unsigned int size)
 }
 #endif
 
-void rascal_get_errmsg(rrid_t rid, char *dst, unsigned int size)
+RASCAL_API(void) rascal_get_errmsg(rrid_t rid, char *dst, unsigned int size)
 {
 	const char *msg = NULL;
 

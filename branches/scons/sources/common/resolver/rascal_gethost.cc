@@ -80,7 +80,7 @@ bool gethost::dump(char *&dst, unsigned int &size)
 }
 
 
-rrid_t rascal_gethost(const addr_t *addr, rascal_gethost_callback cb, void *context)
+RASCAL_API(rrid_t) rascal_gethost(const addr_t *addr, rascal_gethost_callback cb, void *context)
 {
 	rrid_t rid;
 	new gethost(addr, cb, context, rid);

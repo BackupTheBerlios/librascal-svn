@@ -34,9 +34,3 @@ rrid_t rascal_connect_ex(const sock_t *target, rascal_dispatcher disp, void *con
 
 	return tmp->get_id();
 }
-
-
-rrid_t rascal_connect(const sock_t *target, rascal_dispatcher disp, void *context)
-{
-	return rascal_connect_ex(target, disp, context, NULL);
-}

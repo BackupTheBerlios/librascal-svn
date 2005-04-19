@@ -6,7 +6,7 @@
 
 #include "connection.h"
 
-rrid_t rascal_read(rrid_t rid, char *to, unsigned int *size)
+RASCAL_API(rrid_t) rascal_read(rrid_t rid, char *to, unsigned int *size)
 {
 	pobject<connection> tmp(rid);
 
@@ -17,7 +17,7 @@ rrid_t rascal_read(rrid_t rid, char *to, unsigned int *size)
 }
 
 
-rrid_t rascal_reads(rrid_t rid, char *to, unsigned int *size, int flags)
+RASCAL_API(rrid_t) rascal_reads(rrid_t rid, char *to, unsigned int *size, int flags)
 {
 	pobject<connection> tmp(rid);
 

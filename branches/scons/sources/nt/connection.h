@@ -80,7 +80,7 @@ public:
 // Base class for asynchronous operations.
 class overlapped : public OVERLAPPED
 {
-	friend DWORD connect_ex_thread(LPVOID);
+	friend DWORD WINAPI connect_ex_thread(LPVOID);
 protected:
 	DECLARE_ALLOCATOR;
 	// Object that this request corresponds to.

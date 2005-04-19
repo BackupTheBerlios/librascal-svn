@@ -4,7 +4,6 @@
 //
 // $Id$
 
-#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,7 +16,8 @@
 # include <unistd.h>
 #endif
 #include <sys/stat.h>
-#include <rascal.h>
+#include "fugetopt.h"
+#include "rascal.h"
 #include "sem.h"
 
 #ifndef dimof

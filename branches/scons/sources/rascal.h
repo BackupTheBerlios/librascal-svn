@@ -90,9 +90,9 @@ typedef int rrid_t;
 #endif
 
 #ifdef BUILD_RASCAL
-# define RASCAL_API(type) RASCAL_EXT type __rascall RASCAL_EXP
+# define RASCAL_API(type) RASCAL_EXT type RASCAL_EXP __rascall
 #else
-# define RASCAL_API(type) RASCAL_EXT type __rascall RASCAL_IMP
+# define RASCAL_API(type) RASCAL_EXT type RASCAL_IMP __rascall
 #endif
 
 #define REC_SUCCESS          (int)0x00000000

@@ -16,13 +16,13 @@ namespace funs {
 
 unsigned int atou(const char *);
 void strlcpy_local(char *, const char *, size_t);
-void strlcat_local(char *, const char *, size_t);
+// void strlcat_local(char *, const char *, size_t);
 void strlcpya(char *, size_t, ...);
-void strlcata(char *, size_t, ...);
-int strisdigit(const char *);
-void strtoupper(char *);
-char * strtok_r(char *src, const char *sep, char **state);
-char * strtok(char *src, const char *sep);
+// void strlcata(char *, size_t, ...);
+// int strisdigit(const char *);
+// void strtoupper(char *);
+// char * strtok_r(char *src, const char *sep, char **state);
+// char * strtok(char *src, const char *sep);
 
 }
 

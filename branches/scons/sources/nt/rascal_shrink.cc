@@ -6,6 +6,6 @@
 
 #include "connection.h"
 
-void rascal_shrink(void)
+RASCAL_API(void) rascal_shrink(void)
 {
 }

@@ -14,7 +14,6 @@
 
 extern rrid_t connect_ex_init(void);
 
-
 static void ns_initres_get(IP_ADDR_STRING *ias)
 {
 	rrid_t rc;
@@ -60,7 +59,7 @@ static void nt_initres(void)
 }
 
 
-rrid_t rascal_init(unsigned int policy)
+RASCAL_API(rrid_t) rascal_init(unsigned int policy)
 {
 	rrid_t rc;
 

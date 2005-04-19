@@ -396,6 +396,3 @@ void getsrv::on_getaddr(void *context, const char *, unsigned int addrc, const a
 		reinterpret_cast<getsrv *>(req)->on_getaddr(addrc, addrv, ((unsigned int)context) >> 16);
 	}
 }
-
-// The average line length for this file is astonishing.
-// vim:ts=2:ss=2:sw=2

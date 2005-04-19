@@ -6,7 +6,7 @@
 
 #include "connection.h"
 
-rrid_t rascal_set_context(rrid_t rid, void *context)
+RASCAL_API(rrid_t) rascal_set_context(rrid_t rid, void *context)
 {
 	pobject<connection> tmp(rid);
 

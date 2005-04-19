@@ -5,7 +5,6 @@
 // $Id$
 
 #include <ctype.h>
-#include <getopt.h>
 #ifdef _WIN32
 # include <malloc.h> // alloca()
 #endif
@@ -18,6 +17,7 @@
 # include <windows.h>
 # define sleep(c) Sleep(c * 1000)
 #endif
+#include "fugetopt.h"
 #include "rascal.h"
 
 using namespace rascal;

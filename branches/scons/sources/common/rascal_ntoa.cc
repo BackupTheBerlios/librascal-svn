@@ -6,7 +6,6 @@
 
 #include "common.h"
 
-
 static const char *octets[256] =
 {
     "0",   "1",   "2",   "3",   "4",   "5",   "6",   "7",   "8",   "9",
@@ -38,7 +37,7 @@ static const char *octets[256] =
 };
 
 
-void rascal_ntoa(const addr_t *addr, char *dst, unsigned int size)
+RASCAL_API(void) rascal_ntoa(const addr_t *addr, char *dst, unsigned int size)
 {
 	const char *seg;
 	const unsigned char *src = addr->data, *limit = src + 4;
