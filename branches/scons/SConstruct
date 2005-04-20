@@ -34,8 +34,9 @@ Usage: scons [options]
 
 The following options are available:
 
-  DEBUG=yes   : include debug symbols and output.
-  RELEASE=yes : set when you are preparing a release package
+  debug=yes   : include debug symbols and output.
+  release=yes : set when you are preparing a release package.
+  samples=yes : build sample programs, too.
 
 Send your comments to Justin Forest <justin.forest@gmail.com>
 """)
@@ -47,15 +48,19 @@ fnd = Finder()
 
 # Build options.
 opts = Options('config.options')
-opts.Add(
-	BoolOption('DEBUG', 'Set to include debug symbols and output', False),
-	BoolOption('SAMPLES', 'Set to build sample programs', False),
-	BoolOption('RELEASE', 'Set this option only if you are preparing a release', False)
-	)
+opts.Add(BoolOption('debug', 'Set to include debug symbols and output', False))
+opts.Add(BoolOption('samples', 'Set to build sample programs', False))
+opts.Add(BoolOption('release', 'Set this option only if you are preparing a release', False))
+opts.Add(EnumOption('build_tool', 'Override the build tool (for maintainers mostly)', 'default', allowed_values = ('default', 'mingw'), ignorecase = 1))
 
 # The default environment.
 env = Environment(options = opts)
-env.Append(CPPDEFINES = [('VERSION', version), 'RASCAL_HELPERS'], LIBPATH = output_dir)
+
+# Override the tool if there are many installed.
+if env['build_tool'] != 'default':
+	env = Environment(tools = [env['build_tool']], options = opts)
+
+env.Append(CPPDEFINES = [('VERSION', version)])
 
 # Check the system configuration if we're not cleaning up.
 if env.GetOption('clean'):
@@ -101,7 +106,7 @@ else:
 		if not conf.CheckLib('pthread'):
 			print 'You must have the pthread library installed.'
 			Exit(1)
-	if env['DEBUG'] == 1:
+	if env['debug'] == 1:
 		if conf.CheckLib('flog'):
 			conf.env.Append(CPPDEFINES = 'HAVE_flog')
 	if not conf.CheckCHeader('pthread.h'):
@@ -116,7 +121,7 @@ else:
 	env['LIBARCH'] = 'bsd'
 
 # Adapt to a debug build.
-if env['DEBUG'] == 1:
+if env['debug'] == 1:
 	print '*** DEBUG BUILD ***'
 	env.Append(CPPDEFINES = '_DEBUG')
 	if env['CC'] == 'cl':
@@ -130,6 +135,9 @@ else:
 	if env['CC'] == 'cl':
 		env.Append(CCFLAGS = '/Ox /G5 /GF /Gy /MD')
 		env.Append(LINKFLAGS = '/RELEASE /OPT:REF /OPT:ICF')
+	elif env['CC'] == 'gcc':
+		env.Append(CCFLAGS = '-O3 -fomit-frame-pointer -finline-functions')
+		env.Append(LINKFLAGS = '-s --gc-sections')
 
 opts.Save('config.options', env)
 Export('env', 'fnd')
@@ -138,7 +146,8 @@ Export('env', 'fnd')
 SConscript(os.path.join('sources', env['LIBARCH'], 'SConscript'))
 
 # Build the samples.
-SConscript('sources/samples/SConscript')
+if env['samples'] == '1':
+	SConscript('sources/samples/SConscript')
 
 if env['PLATFORM'] != 'win32':
 	# Build a source tarball.

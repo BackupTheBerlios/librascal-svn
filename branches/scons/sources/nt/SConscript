@@ -4,9 +4,9 @@ Import('env', 'fnd')
 def libgen(source, target, env, for_signature):
 	action = ''
 	for key in string.split(os.environ['PATH'], ';'):
-		tool = os.path.join(key, 'dlltool.exe')
+		tool = os.path.join(key, 'no-reimp.exe')
 		if os.path.isfile(tool):
-			action = tool + ' --dllname "' + str(source[0]) + '" --def "' + str(target[0]) + '.def" --output-lib "' + str(target[0]) + '.a"'
+			action = tool + ' ' + str(target[0]) + '.lib'
 	return action
 
 envnt = env.Copy()
