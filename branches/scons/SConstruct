@@ -136,7 +136,7 @@ else:
 		env.Append(CCFLAGS = '/Ox /G5 /GF /Gy /MD')
 		env.Append(LINKFLAGS = '/RELEASE /OPT:REF /OPT:ICF')
 	elif env['CC'] == 'gcc':
-		env.Append(CCFLAGS = '-O3 -fomit-frame-pointer -finline-functions')
+		env.Append(CCFLAGS = '-O3 -fomit-frame-pointer -finline-functions -fno-exceptions')
 		env.Append(LINKFLAGS = '-s --gc-sections')
 
 opts.Save('config.options', env)
