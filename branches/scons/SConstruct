@@ -86,6 +86,8 @@ else:
 			print 'The iphlpapi library is required (usually available on nt).'
 			Exit(1)
 		conf.CheckLib('user32')
+		if conf.CheckFunc('CryptGenRandom'):
+      conf.env.Append(CPPDEFINES = 'HAVE_CryptGenRandom')
 		if not conf.CheckLib(['pthread', 'pthreadGC', 'pthreadVC']):
 			print 'You must have the pthread library installed.'
 			Exit(1)
