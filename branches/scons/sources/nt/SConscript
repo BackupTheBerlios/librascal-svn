@@ -24,4 +24,5 @@ dll = envnt.SharedLibrary('rascal', objs)
 if envnt['CC'] == 'cl':
 	envnt.Lib2a(dll)
 
+# $Id$
 # vim:ts=2:sts=2:sw=2:noet:syntax=python

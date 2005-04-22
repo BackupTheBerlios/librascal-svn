@@ -10,3 +10,6 @@ for item in fnd.listFiles(['.', '../common'], r'^.*(\.cc)$'):
 	objs.append(envbsd.SharedObject(fname + '.os', item))
 
 envbsd.SharedLibrary('rascal', objs)
+
+# $Id$
+# vim:ts=2:sts=2:sw=2:noet:syntax=python
