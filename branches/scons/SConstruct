@@ -4,6 +4,7 @@
 
 import os
 import re
+import string
 
 class Finder:
   # A function to list files in a directory.
@@ -67,6 +68,16 @@ if env.GetOption('clean'):
 	print 'Skipping autoconfiguration due to a clean-up.'
 else:
 	print 'Configuring for platform: ' + env['PLATFORM'] + '.'
+
+	if os.environ.has_key('CPATH'):
+		for em in string.split(os.environ['CPATH'], ';'):
+			env.Append(CPPPATH = em)
+			print 'Importing include directory %s from the environment.' % (em)
+	if os.environ.has_key('LIBRARY_PATH'):
+		for em in string.split(os.environ['LIBRARY_PATH'], ';'):
+			env.Append(LIBPATH = em)
+			print 'Importing library directory %s from the environment.' % (em)
+
 	conf = Configure(env)
 	if not conf.CheckFunc('strlcpy'):
 		print 'Could not find strlcpy(), using local version.'
@@ -87,8 +98,8 @@ else:
 			Exit(1)
 		conf.CheckLib('user32')
 		if conf.CheckFunc('CryptGenRandom'):
-      conf.env.Append(CPPDEFINES = 'HAVE_CryptGenRandom')
-		if not conf.CheckLib(['pthread', 'pthreadGC', 'pthreadVC']):
+			conf.env.Append(CPPDEFINES = 'HAVE_CryptGenRandom')
+		if not conf.CheckLib(['pthread', 'pthreadGC2', 'pthreadGC', 'pthreadVC']):
 			print 'You must have the pthread library installed.'
 			Exit(1)
 		if not conf.CheckFunc('snprintf'):
