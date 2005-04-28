@@ -1,6 +1,6 @@
 # SCons script for librascal.
 # $Id$
-# vim:ts=2:sts=2:sw=2:noet:nocindent:syntax=python
+# vim:ts=2:sts=2:sw=2:et:nocindent:syntax=python
 
 import os
 import re
@@ -59,98 +59,98 @@ env = Environment(options = opts)
 
 # Override the tool if there are many installed.
 if env['build_tool'] != 'default':
-	env = Environment(tools = [env['build_tool']], options = opts)
+  env = Environment(tools = [env['build_tool']], options = opts)
 
 env.Append(CPPDEFINES = [('VERSION', version)])
 
 # Check the system configuration if we're not cleaning up.
 if env.GetOption('clean'):
-	print 'Skipping autoconfiguration due to a clean-up.'
+  print 'Skipping autoconfiguration due to a clean-up.'
 else:
-	print 'Configuring for platform: ' + env['PLATFORM'] + '.'
+  print 'Configuring for platform: ' + env['PLATFORM'] + '.'
 
-	if os.environ.has_key('CPATH'):
-		for em in string.split(os.environ['CPATH'], ';'):
-			env.Append(CPPPATH = em)
-			print 'Importing include directory %s from the environment.' % (em)
-	if os.environ.has_key('LIBRARY_PATH'):
-		for em in string.split(os.environ['LIBRARY_PATH'], ';'):
-			env.Append(LIBPATH = em)
-			print 'Importing library directory %s from the environment.' % (em)
+  if os.environ.has_key('CPATH'):
+    for em in string.split(os.environ['CPATH'], ';'):
+      env.Append(CPPPATH = em)
+      print 'Importing include directory %s from the environment.' % (em)
+  if os.environ.has_key('LIBRARY_PATH'):
+    for em in string.split(os.environ['LIBRARY_PATH'], ';'):
+      env.Append(LIBPATH = em)
+      print 'Importing library directory %s from the environment.' % (em)
 
-	conf = Configure(env)
-	if not conf.CheckFunc('strlcpy'):
-		print 'Could not find strlcpy(), using local version.'
-		conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
-	if conf.CheckFunc('getopt'):
-		conf.env.Append(CPPDEFINES = 'HAVE_getopt')
-	if env['PLATFORM'] == 'win32':
-		conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
-		# Windows specific.
-		if not conf.CheckLib('ws2_32'):
-			print 'The winsock2 library is not available (very unusual).'
-			Exit(1)
-		if not conf.CheckLib('mswsock'):
-			print 'The mswsock library is required (usually available on nt).'
-			Exit(1)
-		if not conf.CheckLib('iphlpapi'):
-			print 'The iphlpapi library is required (usually available on nt).'
-			Exit(1)
-		conf.CheckLib('user32')
-		if conf.CheckFunc('CryptGenRandom'):
-			conf.env.Append(CPPDEFINES = 'HAVE_CryptGenRandom')
-		if not conf.CheckLib(['pthread', 'pthreadGC2', 'pthreadGC', 'pthreadVC']):
-			print 'You must have the pthread library installed.'
-			Exit(1)
-		if not conf.CheckFunc('snprintf'):
-			if conf.CheckFunc('_snprintf'):
-				conf.env.Append(CPPDEFINES = 'snprintf=_snprintf')
-			else:
-				print 'The snprintf() function is not avaialble (very unusual).'
-				Exit(1)
-		if not conf.CheckFunc('vsnprintf'):
-			if conf.CheckFunc('_vsnprintf'):
-				conf.env.Append(CPPDEFINES = 'vsnprintf=_vsnprintf')
-			else:
-				print 'The vsnprintf() function is not avaialble (very unusual).'
-				Exit(1)
-	else:
-		# POSIX specific.
-		if not conf.CheckLib('pthread'):
-			print 'You must have the pthread library installed.'
-			Exit(1)
-	if env['debug'] == 1:
-		if conf.CheckLib('flog'):
-			conf.env.Append(CPPDEFINES = 'HAVE_flog')
-	if not conf.CheckCHeader('pthread.h'):
-		print 'You must have the pthread library properly installed.'
-		Exit(1)
-	env = conf.Finish()
+  conf = Configure(env)
+  if not conf.CheckFunc('strlcpy'):
+    print 'Could not find strlcpy(), using local version.'
+    conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
+  if conf.CheckFunc('getopt'):
+    conf.env.Append(CPPDEFINES = 'HAVE_getopt')
+  if env['PLATFORM'] == 'win32':
+    conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
+    # Windows specific.
+    if not conf.CheckLib('ws2_32'):
+      print 'The winsock2 library is not available (very unusual).'
+      Exit(1)
+    if not conf.CheckLib('mswsock'):
+      print 'The mswsock library is required (usually available on nt).'
+      Exit(1)
+    if not conf.CheckLib('iphlpapi'):
+      print 'The iphlpapi library is required (usually available on nt).'
+      Exit(1)
+    conf.CheckLib('user32')
+    if conf.CheckFunc('CryptGenRandom'):
+      conf.env.Append(CPPDEFINES = 'HAVE_CryptGenRandom')
+    if not conf.CheckLib(['pthread', 'pthreadGC2', 'pthreadGC', 'pthreadVC']):
+      print 'You must have the pthread library installed.'
+      Exit(1)
+    if not conf.CheckFunc('snprintf'):
+      if conf.CheckFunc('_snprintf'):
+        conf.env.Append(CPPDEFINES = 'snprintf=_snprintf')
+      else:
+        print 'The snprintf() function is not avaialble (very unusual).'
+        Exit(1)
+    if not conf.CheckFunc('vsnprintf'):
+      if conf.CheckFunc('_vsnprintf'):
+        conf.env.Append(CPPDEFINES = 'vsnprintf=_vsnprintf')
+      else:
+        print 'The vsnprintf() function is not avaialble (very unusual).'
+        Exit(1)
+  else:
+    # POSIX specific.
+    if not conf.CheckLib('pthread'):
+      print 'You must have the pthread library installed.'
+      Exit(1)
+  if env['debug'] == 1:
+    if conf.CheckLib('flog'):
+      conf.env.Append(CPPDEFINES = 'HAVE_flog')
+  if not conf.CheckCHeader('pthread.h'):
+    print 'You must have the pthread library properly installed.'
+    Exit(1)
+  env = conf.Finish()
 
 # Platform-dependent code.
 if env['PLATFORM'] == 'win32':
-	env['LIBARCH'] = 'nt'
+  env['LIBARCH'] = 'nt'
 else:
-	env['LIBARCH'] = 'bsd'
+  env['LIBARCH'] = 'bsd'
 
 # Adapt to a debug build.
 if env['debug'] == 1:
-	print '*** DEBUG BUILD ***'
-	env.Append(CPPDEFINES = '_DEBUG')
-	if env['CC'] == 'cl':
-		env.Append(CCFLAGS = '/Od /GX /EHsc /MDd /Z7')
-		env.Append(LINKFLAGS = '/DEBUG /OPT:NOICF /OPT:NOREF')
-	elif env['CC'] == 'gcc':
-		env.Append(CCFLAGS = '-g -O0')
+  print '*** DEBUG BUILD ***'
+  env.Append(CPPDEFINES = '_DEBUG')
+  if env['CC'] == 'cl':
+    env.Append(CCFLAGS = '/Od /GX /EHsc /MDd /Z7')
+    env.Append(LINKFLAGS = '/DEBUG /OPT:NOICF /OPT:NOREF')
+  elif env['CC'] == 'gcc':
+    env.Append(CCFLAGS = '-g -O0')
 
 # Adapt to a release build.
 else:
-	if env['CC'] == 'cl':
-		env.Append(CCFLAGS = '/Ox /G5 /GF /Gy /MD')
-		env.Append(LINKFLAGS = '/RELEASE /OPT:REF /OPT:ICF')
-	elif env['CC'] == 'gcc':
-		env.Append(CCFLAGS = '-O3 -fomit-frame-pointer -finline-functions -fno-exceptions')
-		env.Append(LINKFLAGS = '-s --gc-sections')
+  if env['CC'] == 'cl':
+    env.Append(CCFLAGS = '/Ox /G5 /GF /Gy /MD')
+    env.Append(LINKFLAGS = '/RELEASE /OPT:REF /OPT:ICF')
+  elif env['CC'] == 'gcc':
+    env.Append(CCFLAGS = '-O3 -fomit-frame-pointer -finline-functions -fno-exceptions')
+    env.Append(LINKFLAGS = '-s --gc-sections')
 
 opts.Save('config.options', env)
 Export('env', 'fnd')
@@ -160,8 +160,8 @@ SConscript(os.path.join('sources', env['LIBARCH'], 'SConscript'))
 
 # Build the samples.
 if env['samples'] == '1':
-	SConscript('sources/samples/SConscript')
+  SConscript('sources/samples/SConscript')
 
 if env['PLATFORM'] != 'win32':
-	# Build a source tarball.
-	Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', fnd.listFiles(['.'], r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$'))
+  # Build a source tarball.
+  Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', fnd.listFiles(['.'], r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$'))
