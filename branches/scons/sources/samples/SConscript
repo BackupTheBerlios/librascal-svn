@@ -1,19 +1,20 @@
 import os
-Import('env', 'fnd')
+Import('env', 'fae')
 
 envsam = env.Copy()
-envsam.Append(CPPPATH = ['../common/util', '..'],
-	CPPDEFINES = [('funs', 'rasamples')],
-	LIBPATH = '#/../../' + env['LIBARCH'], LIBS = 'rascal')
+envsam.Append(
+	CPPDEFINES = [('funs', 'rasamples'), 'RASCAL_HELPERS'],
+	category = 'smp',
+	CPPPATH = ['../common/util'],
+	LIBPATH = ['../' + env['LIBARCH']],
+	LIBS = ['rascal'])
 
-src = fnd.listFiles(['../common/util'], r'^.*(\.cc)$')
-
-envsam.Program('raconn', src + ['01-raconn/raconn.cc'])
-envsam.Program('raconns', src + ['02-raconns/test-02.cc'])
-envsam.Program('rahost', src + ['04-rahost/rahost.cc'])
-envsam.Program('raflood', src + ['05-raflood/raflood.cc'])
-envsam.Program('ralc', src + ['06-ralc/ralc.cc'])
-envsam.Program('rasvc', src + ['07-rasvc/rasvc.cc'])
+envsam.Program('raconn', fae.compile(envsam, ['../common/util', '01-raconn']))
+envsam.Program('raconns', fae.compile(envsam, ['../common/util', '02-raconns']))
+envsam.Program('rahost', fae.compile(envsam, ['../common/util', '04-rahost']))
+envsam.Program('raflood', fae.compile(envsam, ['../common/util', '05-raflood']))
+envsam.Program('ralc', fae.compile(envsam, ['../common/util', '06-ralc']))
+envsam.Program('rasvc', fae.compile(envsam, ['../common/util', '07-rasvc']))
 
 # $Id$
-# vim:ts=2:sts=2:sw=2:noet:syntax=python
+# vim:ts=4:sts=4:sw=4:noet:syntax=python
