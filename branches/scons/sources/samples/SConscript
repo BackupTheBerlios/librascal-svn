@@ -9,12 +9,8 @@ envsam.Append(
 	LIBPATH = ['../' + env['LIBARCH']],
 	LIBS = ['rascal'])
 
-envsam.Program('raconn', fae.compile(envsam, ['../common/util', '01-raconn']))
-envsam.Program('raconns', fae.compile(envsam, ['../common/util', '02-raconns']))
-envsam.Program('rahost', fae.compile(envsam, ['../common/util', '04-rahost']))
-envsam.Program('raflood', fae.compile(envsam, ['../common/util', '05-raflood']))
-envsam.Program('ralc', fae.compile(envsam, ['../common/util', '06-ralc']))
-envsam.Program('rasvc', fae.compile(envsam, ['../common/util', '07-rasvc']))
+for sub in ['raconn', 'raconns', 'raflood', 'rahost', 'ralc', 'rasvc']:
+	envsam.Program(sub + '/' + sub, fae.compile(envsam, ['../common/util', sub]))
 
 # $Id$
 # vim:ts=4:sts=4:sw=4:noet:syntax=python
