@@ -49,6 +49,9 @@ else:
     conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
   if conf.CheckFunc('getopt'):
     conf.env.Append(CPPDEFINES = 'HAVE_getopt')
+  if conf.CheckLib('resolv'):
+    if conf.CheckFunc('res_init'):
+      conf.env.Append(CPPDEFINES = 'HAVE_res_init')
   if env['PLATFORM'] == 'win32':
     conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
     # Windows specific.
