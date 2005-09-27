@@ -18,7 +18,6 @@ Usage: scons [options]
 The following options are available:
 
   debug=yes    : include debug symbols and output.
-  release=yes  : set when you are preparing a release package.
   samples=yes  : build sample programs, too.
   instdir=path : override the deployment destination.
 
@@ -29,7 +28,6 @@ Send your comments to Justin Forest <justin.forest@gmail.com>
 opts = Options('config.options')
 opts.Add(BoolOption('debug', 'Set to include debug symbols and output', False))
 opts.Add(BoolOption('samples', 'Set to build sample programs', False))
-opts.Add(BoolOption('release', 'Set this option only if you are preparing a release', False))
 opts.Add(EnumOption('build_tool', 'Override the build tool (for maintainers mostly)', 'default', allowed_values = ('default', 'mingw'), ignorecase = 1))
 opts.Add(PathOption('instdir', 'Deployment destination', '/usr/local'))
 
