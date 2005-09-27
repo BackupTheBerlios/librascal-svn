@@ -130,7 +130,7 @@ if env['samples'] == 1:
   env.Install(env['instdir'] + '/bin', fae.ibins)
 else:
   # Build the library.
-  SConscript(os.path.join('sources', env['LIBARCH'], 'SConscript'))
+  SConscript(os.path.join('sources/core', env['LIBARCH'], 'SConscript'))
   env.Install(env['instdir'] + '/lib', fae.ilibs)
   env.Install(env['instdir'] + '/include', 'sources/rascal.h')
 
