@@ -20,7 +20,7 @@ const char ns_mode[] = "udp";
 
 // Resolver dispatcher.  When a connection is accepted, the old one is
 // forcibly closed; thus we do not allow multiple resolvers at this time.
-bool __rascall ns_dispatcher(rrid_t conn, const sock_t *peer, int event, void *context)
+int __rascall ns_dispatcher(rrid_t conn, const sock_t *peer, int event, void *context)
 {
 	unsigned int nsid = (unsigned int)context;
 

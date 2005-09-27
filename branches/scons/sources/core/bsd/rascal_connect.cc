@@ -4,8 +4,6 @@
 //
 // $Id$
 
-#include <errno.h>
-#include <string.h>
 #include "connection.h"
 #include "../common/debug.h"
 

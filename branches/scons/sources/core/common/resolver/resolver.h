@@ -264,7 +264,7 @@ class getsrv : public request
 	// Attempts to connect to the first address in the list.
 	void try_next_server(void);
 	// Connection dispatcher.
-	static bool __rascall try_next_server_disp(rrid_t rid, const sock_t *peer, int event, void *context);
+	static int __rascall try_next_server_disp(rrid_t rid, const sock_t *peer, int event, void *context);
 	// Sorting stub.
 	void sort(void);
 protected:
@@ -287,6 +287,6 @@ extern rrid_t ns_rids[NAMESERVER_COUNT];
 extern const char ns_mode[];
 
 // Resolver dispatcher.
-extern bool __rascall ns_dispatcher(rrid_t conn, const sock_t *peer, int event, void *context);
+extern int __rascall ns_dispatcher(rrid_t conn, const sock_t *peer, int event, void *context);
 
 #endif // __rascal_resolver_h

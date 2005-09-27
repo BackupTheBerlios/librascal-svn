@@ -100,7 +100,7 @@ inline static bool inaddr_parse_v4(const char *ptn, unsigned char *addr, unsigne
 }
 
 
-RASCAL_API(bool) rascal_aton(const char *pattern, addr_t *addr, addr_t *mask)
+RASCAL_API(int) rascal_aton(const char *pattern, addr_t *addr, addr_t *mask)
 {
 	addr_t tmp;
 

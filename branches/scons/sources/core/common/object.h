@@ -86,7 +86,7 @@
 
 #include "util/mutex.h"
 #include "util/sem.h"
-#include "../rascal.h"
+#include "../plus.h"
 
 #define DECLARE_CLASSID(name) \
 	static ot_t get_class_ot(void) { static ot_t _t = "ot_" #name; return _t; } \

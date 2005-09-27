@@ -7,6 +7,7 @@
 #ifndef __rascal_bsd_connection_h
 #define __rascal_bsd_connection_h
 
+#include "bsd.h"
 #include "../common/object.h"
 #include "../common/common.h"
 #include "../common/util/ftspec.h"

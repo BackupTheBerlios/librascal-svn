@@ -4,16 +4,6 @@
 //
 // $Id$
 
-#include <errno.h>
-#include <string.h>
-#ifndef _WIN32
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <sys/ioctl.h>
-# include <netinet/in.h>
-# include <unistd.h>
-#endif
-
 #include "connection.h"
 #include "../common/datachain.h"
 #include "../common/debug.h"

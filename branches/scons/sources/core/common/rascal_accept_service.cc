@@ -29,7 +29,7 @@ struct ris_data
 };
 
 // The filter acts as an event router this time.
-static bool __rascall ris_filter(void *context, const sock_t *addr)
+static int __rascall ris_filter(void *context, const sock_t *addr)
 {
 	rrid_t rid;
 	ris_data *ris = reinterpret_cast<ris_data *>(context);
@@ -54,7 +54,7 @@ static bool __rascall ris_filter(void *context, const sock_t *addr)
 	return false;
 }
 
-static bool __rascall ris_disp(rrid_t, const sock_t *, int, void *context)
+static int __rascall ris_disp(rrid_t, const sock_t *, int, void *context)
 {
 	ris_data *ris = reinterpret_cast<ris_data *>(context);
 	debug((flog, rl_accept_svc, "%x: deleting the temporary request.", ris->rid));

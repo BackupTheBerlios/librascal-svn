@@ -51,7 +51,13 @@ typedef struct sock_t {
 	struct addr_t addr;
 	unsigned short port;
 #ifdef __cplusplus
-	sock_t(const sock_t &src) {
+	sock_t()
+	{
+		port = 0;
+		addr.length = 0;
+	}
+	sock_t(const sock_t &src)
+	{
 		port = src.port;
 		addr = src.addr;
 	}

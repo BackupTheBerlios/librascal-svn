@@ -189,7 +189,7 @@ void getsrv::on_event(header &hdr, const char *src, unsigned int size)
 }
 
 
-bool getsrv::try_next_server_disp(rrid_t rid, const sock_t *peer, int event, void *context)
+int getsrv::try_next_server_disp(rrid_t rid, const sock_t *peer, int event, void *context)
 {
 	getsrv *req = reinterpret_cast<getsrv *>(request::pick((unsigned int)context));
 
