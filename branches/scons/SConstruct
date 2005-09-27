@@ -7,7 +7,8 @@ import os
 import string
 
 # Library version number.
-version = '1.0'
+compatibility_version = '1.0'
+current_version = '1.0'
 
 fae = faerion.Faerion()
 
@@ -16,9 +17,10 @@ Usage: scons [options]
 
 The following options are available:
 
-  debug=yes   : include debug symbols and output.
-  release=yes : set when you are preparing a release package.
-  samples=yes : build sample programs, too.
+  debug=yes    : include debug symbols and output.
+  release=yes  : set when you are preparing a release package.
+  samples=yes  : build sample programs, too.
+  instdir=path : override the deployment destination.
 
 Send your comments to Justin Forest <justin.forest@gmail.com>
 """)
@@ -29,6 +31,7 @@ opts.Add(BoolOption('debug', 'Set to include debug symbols and output', False))
 opts.Add(BoolOption('samples', 'Set to build sample programs', False))
 opts.Add(BoolOption('release', 'Set this option only if you are preparing a release', False))
 opts.Add(EnumOption('build_tool', 'Override the build tool (for maintainers mostly)', 'default', allowed_values = ('default', 'mingw'), ignorecase = 1))
+opts.Add(PathOption('instdir', 'Deployment destination', '/usr/local'))
 
 # The default environment.
 env = Environment(options = opts)
@@ -37,7 +40,7 @@ env = Environment(options = opts)
 if env['build_tool'] != 'default':
   env = Environment(tools = [env['build_tool']], options = opts)
 
-env.Append(CPPDEFINES = [('VERSION', version)])
+env.Append(CPPDEFINES = [('VERSION', current_version), ('MYROOT', env['instdir'])])
 
 # Check the system configuration if we're not cleaning up.
 if env.GetOption('clean'):
@@ -49,9 +52,9 @@ else:
     conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
   if conf.CheckFunc('getopt'):
     conf.env.Append(CPPDEFINES = 'HAVE_getopt')
-  if conf.CheckLib('resolv'):
-    if conf.CheckFunc('res_init'):
-      conf.env.Append(CPPDEFINES = 'HAVE_res_init')
+  if conf.CheckFunc('res_init'):
+    conf.env.Append(CPPDEFINES = 'HAVE_res_init')
+  conf.CheckLib('resolv')
   if env['PLATFORM'] == 'win32':
     conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
     # Windows specific.
@@ -123,16 +126,15 @@ else:
 opts.Save('config.options', env)
 Export('env', 'fae')
 
-# Build the library.
-SConscript(os.path.join('sources', env['LIBARCH'], 'SConscript'))
-
-# Build the samples.
 if env['samples'] == 1:
+  # Build the samples.
   SConscript('sources/samples/SConscript')
+  env.Install(env['instdir'] + '/bin', fae.ibins)
+else:
+  # Build the library.
+  SConscript(os.path.join('sources', env['LIBARCH'], 'SConscript'))
+  env.Install(env['instdir'] + '/lib', fae.ilibs)
+  env.Install(env['instdir'] + '/include', 'sources/rascal.h')
 
-#if env['PLATFORM'] != 'win32':
-#  # Build a source tarball.
-#  Environment(TARFLAGS = '-c -z').Tar('librascal-' + version + '-src.tar.gz', fae.listFiles(['.'], r'^(LICENSE|SConstruct|.*\.(cc|h|rc|docbook|dtd|css))$'))
-
-if 'release' in COMMAND_LINE_TARGETS:
-  fae.installer(env)
+# Install everything.
+env.Alias('install', env['instdir'])

@@ -17,6 +17,9 @@ import string
 import SCons.Defaults
 
 class Faerion:
+	ilibs = []
+	ibins = []
+
 	def listFilesW(self, at, r):
 		nodes = []
 		for location in at:
@@ -83,11 +86,6 @@ class Faerion:
 	# Builds a configuration object.
 	def Configure(self, conf, env):
 		print 'Configuring for platform: ' + env['PLATFORM'] + '.'
-
-		if os.environ.has_key('CPATH'):
-			for em in string.split(os.environ['CPATH'], ';'):
-				env.Append(CPPPATH = em)
-				print 'Found directory %s in the environment.' % (em)
 
 		return conf
 

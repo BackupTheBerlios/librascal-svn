@@ -5,12 +5,12 @@ envsam = env.Copy()
 envsam.Append(
 	CPPDEFINES = [('funs', 'rasamples'), 'RASCAL_HELPERS'],
 	category = 'smp',
-	CPPPATH = ['../common/util'],
-	LIBPATH = ['../' + env['LIBARCH']],
+	CPPPATH = ['../common/util', env['instdir'] + '/include'],
+	LIBPATH = [env['instdir'] + '/lib'],
 	LIBS = ['rascal'])
 
 for sub in ['raconn', 'raconns', 'raflood', 'rahost', 'ralc', 'rasvc']:
-	envsam.Program(sub + '/' + sub, fae.compile(envsam, ['../common/util', sub]))
+	fae.ibins.append(envsam.Program(sub + '/' + sub, fae.compile(envsam, ['../common/util', sub])))
 
 # $Id$
 # vim:ts=4:sts=4:sw=4:noet:syntax=python
