@@ -1,6 +1,6 @@
 # SCons script for librascal.
 # $Id$
-# vim:ts=2:sts=2:sw=2:et:nocindent:syntax=python
+# vim: ts=2 sts=2 sw=2 et nocindent syntax=python
 
 import faerion
 import os
