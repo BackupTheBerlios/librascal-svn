@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef __rascal_h
-#define __rascal_h
+#ifndef __rascal_api_h
+#define __rascal_api_h
 
 #ifdef _WIN32
 # define __rascall __stdcall
@@ -29,16 +29,21 @@ typedef struct addr_t
 	unsigned int length;
 	unsigned char data[16];
 #ifdef __cplusplus
-	addr_t& operator = (const struct addr_t &src) {
+	addr_t& operator = (const struct addr_t &src)
+	{
 		length = src.length;
-		* (reinterpret_cast<int *>(data) + 0) = * (reinterpret_cast<const int *>(src.data) + 0);
-		* (reinterpret_cast<int *>(data) + 1) = * (reinterpret_cast<const int *>(src.data) + 1);
-		* (reinterpret_cast<int *>(data) + 2) = * (reinterpret_cast<const int *>(src.data) + 2);
-		* (reinterpret_cast<int *>(data) + 3) = * (reinterpret_cast<const int *>(src.data) + 3);
+		for (unsigned int idx = 0; idx < sizeof(data); ++idx)
+			data[idx] = src.data[idx];
 		return *this;
 	}
-	addr_t(const struct addr_t &src) { *this = src; }
-	addr_t(unsigned int _length = 0) { length = _length; }
+	addr_t(const struct addr_t &src)
+	{
+		*this = src;
+	}
+	addr_t(unsigned int _length = 0)
+	{
+		length = _length;
+	}
 #endif
 } addr_t;
 
@@ -46,7 +51,6 @@ typedef struct sock_t {
 	struct addr_t addr;
 	unsigned short port;
 #ifdef __cplusplus
-	sock_t(unsigned short _port = 0) { port = _port; }
 	sock_t(const sock_t &src) {
 		port = src.port;
 		addr = src.addr;
@@ -56,9 +60,12 @@ typedef struct sock_t {
 		addr = src;
 		port = _port;
 	}
-	operator sock_t* () { return this; }
+	operator sock_t * ()
+	{
+		return this;
+	}
 #endif
-#ifdef BUILD_RASCAL
+#if defined(BUILD_RASCAL) && defined(__cplusplus)
 	bool operator == (const sock_t &);
 	bool operator != (const sock_t &src) { return !(*this == src); }
 	sock_t& operator = (const sock_t &);
@@ -72,10 +79,6 @@ typedef struct sock_t {
 } sock_t;
 
 typedef int rrid_t;
-
-#if !defined(__cplusplus) && !defined(__bool_true_false_are_defined)
-# include <stdbool.h>
-#endif
 
 #ifdef __cplusplus
 # define RASCAL_OPTIONAL = 0
@@ -134,13 +137,13 @@ typedef int rrid_t;
 
 #define rascal_isok(rrid) (((rrid) & 0x80000000) == 0)
 
-typedef bool (__rascall * rascal_dispatcher)(rrid_t conn, const sock_t *peer, int event, void *context);
-typedef bool (__rascall * rascal_rcs_filter)(void *context, const sock_t *addr);
+typedef int (__rascall * rascal_dispatcher)(rrid_t conn, const sock_t *peer, int event, void *context);
+typedef int (__rascall * rascal_rcs_filter)(void *context, const sock_t *addr);
 typedef void (__rascall * rascal_getaddr_callback)(void *context, const char *host, unsigned int count, const addr_t *addrs);
 typedef void (__rascall * rascal_gethost_callback)(void *context, const addr_t *addr, unsigned int count, const char **hosts);
 
 RASCAL_API(rrid_t) rascal_accept(const sock_t *addr, rascal_dispatcher, void *context RASCAL_OPTIONAL);
-RASCAL_API(bool)   rascal_aton(const char *pattern, addr_t *addr, addr_t *mask RASCAL_OPTIONAL);
+RASCAL_API(int)   rascal_aton(const char *pattern, addr_t *addr, addr_t *mask RASCAL_OPTIONAL);
 RASCAL_API(rrid_t) rascal_cancel(rrid_t);
 RASCAL_API(rrid_t) rascal_connect(const sock_t *target, rascal_dispatcher, void *context RASCAL_OPTIONAL, const char *proto RASCAL_OPTIONAL);
 RASCAL_API(rrid_t) rascal_connect_service(const char *name, const char *proto, const char *domain, rascal_dispatcher, void *context RASCAL_OPTIONAL, rascal_rcs_filter RASCAL_OPTIONAL);
@@ -173,25 +176,4 @@ enum rop_types {
 	rop_listen
 };
 
-#if defined(__cplusplus) && defined(RASCAL_HELPERS)
-namespace rascal {
-	class errmsg
-	{
-		char tmp[1024];
-	public:
-		errmsg(rrid_t rid) { rascal_get_errmsg(rid, tmp, sizeof(tmp)); }
-		const char * c_str() const { return tmp; }
-	};
-
-	class ntoa
-	{
-		char tmp[256];
-	public:
-		ntoa(const sock_t &peer) { rascal_ntoa(&peer.addr, tmp, sizeof(tmp)); }
-		ntoa(const addr_t &addr) { rascal_ntoa(&addr, tmp, sizeof(tmp)); }
-		const char * c_str() const { return tmp; }
-	};
-};
-#endif
-
-#endif /* __rascal_h */
+#endif /* __rascal_api_h */
