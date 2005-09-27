@@ -3,7 +3,7 @@ Import('env', 'fae')
 
 envsam = env.Copy()
 envsam.Append(
-	CPPDEFINES = [('funs', 'rasamples'), 'RASCAL_HELPERS'],
+	CPPDEFINES = [('funs', 'rasamples')],
 	category = 'smp',
 	CPPPATH = ['../common/util', env['instdir'] + '/include'],
 	LIBPATH = [env['instdir'] + '/lib'],
