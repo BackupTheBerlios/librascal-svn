@@ -1,25 +1,24 @@
 # SCons script for librascal.
+# vim: ts=4 sts=4 sw=4 et nocindent syntax=python
 # $Id$
-# vim: ts=2 sts=2 sw=2 et nocindent syntax=python
 
-import faerion
 import os
-import string
+import re
+import fae
 
 # Library version number.
-compatibility_version = '1.0'
 current_version = '1.0'
-
-fae = faerion.Faerion()
+# API version number.
+api_version = '1.0'
 
 Help("""
 Usage: scons [options]
 
 The following options are available:
 
-  debug=yes    : include debug symbols and output.
-  samples=yes  : build sample programs, too.
-  instdir=path : override the deployment destination.
+    debug=yes        : include debug symbols and output.
+    samples=yes    : build sample programs, too.
+    instdir=path : override the deployment destination.
 
 Send your comments to Justin Forest <justin.forest@gmail.com>
 """)
@@ -33,106 +32,68 @@ opts.Add(PathOption('instdir', 'Deployment destination', '/usr/local'))
 
 # The default environment.
 env = Environment(options = opts)
+env.Append(CPPDEFINES = [('VERSION', current_version)])
 
-# Override the tool if there are many installed.
-if env['build_tool'] != 'default':
-  env = Environment(tools = [env['build_tool']], options = opts)
-
-env.Append(CPPDEFINES = [('VERSION', current_version), ('MYROOT', env['instdir'])])
-
-# Check the system configuration if we're not cleaning up.
-if env.GetOption('clean'):
-  print 'Skipping autoconfiguration due to a clean-up.'
-else:
-  conf = fae.Configure(Configure(env), env)
-  if not conf.CheckFunc('strlcpy'):
-    print 'Could not find strlcpy(), using local version.'
-    conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
-  if conf.CheckFunc('getopt'):
-    conf.env.Append(CPPDEFINES = 'HAVE_getopt')
-  if conf.CheckFunc('res_init'):
-    conf.env.Append(CPPDEFINES = 'HAVE_res_init')
-  conf.CheckLib('resolv')
-  if env['PLATFORM'] == 'win32':
-    conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
-    # Windows specific.
-    if not conf.CheckLib('ws2_32'):
-      print 'The winsock2 library is not available (very unusual).'
-      Exit(1)
-    if not conf.CheckLib('mswsock'):
-      print 'The mswsock library is required (usually available on nt).'
-      Exit(1)
-    if not conf.CheckLib('iphlpapi'):
-      print 'The iphlpapi library is required (usually available on nt).'
-      Exit(1)
-    conf.CheckLib('user32')
-    if conf.CheckFunc('CryptGenRandom'):
-      conf.env.Append(CPPDEFINES = 'HAVE_CryptGenRandom')
-    if not conf.CheckLib(['pthread', 'pthreadGC2', 'pthreadGC', 'pthreadVC']):
-      print 'You must have the pthread library installed.'
-      Exit(1)
-    if not conf.CheckFunc('snprintf'):
-      if conf.CheckFunc('_snprintf'):
-        conf.env.Append(CPPDEFINES = 'snprintf=_snprintf')
-      else:
-        print 'The snprintf() function is not avaialble (very unusual).'
+# Autoconfigure.
+if not env.GetOption('clean'):
+    conf = Configure(env)
+    if not conf.CheckFunc('strlcpy'):
+        conf.env.Append(CPPDEFINES = 'strlcpy=strlcpy_local')
+    if conf.CheckFunc('getopt'):
+        conf.env.Append(CPPDEFINES = 'HAVE_getopt')
+    if conf.CheckFunc('res_init'):
+        conf.env.Append(CPPDEFINES = 'HAVE_res_init')
+    conf.CheckLib('resolv')
+    if env['PLATFORM'] == 'win32':
+        conf.env.Append(CPPDEFINES = 'WIN32_LEAN_AND_MEAN')
+        # Windows specific.
+        if not conf.CheckLib('ws2_32'):
+            print 'The winsock2 library is not available (very unusual).'
+            Exit(1)
+        if not conf.CheckLib('mswsock'):
+            print 'The mswsock library is required (usually available on nt).'
+            Exit(1)
+        if not conf.CheckLib('iphlpapi'):
+            print 'The iphlpapi library is required (usually available on nt).'
+            Exit(1)
+        conf.CheckLib('user32')
+        if conf.CheckFunc('CryptGenRandom'):
+            conf.env.Append(CPPDEFINES = 'HAVE_CryptGenRandom')
+        if not conf.CheckLib(['pthread', 'pthreadGC2', 'pthreadGC', 'pthreadVC']):
+            print 'You must have the pthread library installed.'
+            Exit(1)
+        if not conf.CheckFunc('snprintf'):
+            if conf.CheckFunc('_snprintf'):
+                conf.env.Append(CPPDEFINES = 'snprintf=_snprintf')
+            else:
+                print 'The snprintf() function is not avaialble (very unusual).'
+                Exit(1)
+        if not conf.CheckFunc('vsnprintf'):
+            if conf.CheckFunc('_vsnprintf'):
+                conf.env.Append(CPPDEFINES = 'vsnprintf=_vsnprintf')
+            else:
+                print 'The vsnprintf() function is not avaialble (very unusual).'
+                Exit(1)
+    else:
+        # POSIX specific.
+        if not conf.CheckLib('pthread'):
+            print 'You must have the pthread library installed.'
+            Exit(1)
+    if env['debug'] == 1:
+        if conf.CheckLib('flog'):
+            conf.env.Append(CPPDEFINES = 'HAVE_flog')
+    if not conf.CheckCHeader('pthread.h'):
+        print 'You must have the pthread library properly installed.'
         Exit(1)
-    if not conf.CheckFunc('vsnprintf'):
-      if conf.CheckFunc('_vsnprintf'):
-        conf.env.Append(CPPDEFINES = 'vsnprintf=_vsnprintf')
-      else:
-        print 'The vsnprintf() function is not avaialble (very unusual).'
-        Exit(1)
-  else:
-    # POSIX specific.
-    if not conf.CheckLib('pthread'):
-      print 'You must have the pthread library installed.'
-      Exit(1)
-  if env['debug'] == 1:
-    if conf.CheckLib('flog'):
-      conf.env.Append(CPPDEFINES = 'HAVE_flog')
-  if not conf.CheckCHeader('pthread.h'):
-    print 'You must have the pthread library properly installed.'
-    Exit(1)
-  env = fae.FinishConf(conf)
+    env = conf.Finish()
 
-# Platform-dependent code.
-if env['PLATFORM'] == 'win32':
-  env['LIBARCH'] = 'nt'
+# Choose the platform.
+if Platform() == 'win32':
+    env['LIBARCH'] = 'nt'
 else:
-  env['LIBARCH'] = 'bsd'
+    env['LIBARCH'] = 'bsd'
 
-# Adapt to a debug build.
-if env['debug'] == 1:
-  print '*** DEBUG BUILD ***'
-  env.Append(CPPDEFINES = '_DEBUG')
-  if env['CC'] == 'cl':
-    env.Append(CCFLAGS = '/Od /GX /EHsc /MDd /Z7')
-    env.Append(LINKFLAGS = '/DEBUG /OPT:NOICF /OPT:NOREF')
-  elif env['CC'] == 'gcc':
-    env.Append(CCFLAGS = '-g -O0')
-
-# Adapt to a release build.
-else:
-  if env['CC'] == 'cl':
-    env.Append(CCFLAGS = '/Ox /G5 /GF /Gy /MD')
-    env.Append(LINKFLAGS = '/RELEASE /OPT:REF /OPT:ICF')
-  elif env['CC'] == 'gcc':
-    env.Append(CCFLAGS = '-O3 -fomit-frame-pointer -finline-functions -fno-exceptions')
-    env.Append(LINKFLAGS = '-s --gc-sections')
-
-opts.Save('config.options', env)
-Export('env', 'fae')
-
-if env['samples'] == 1:
-  # Build the samples.
-  SConscript('sources/samples/SConscript')
-  env.Install(env['instdir'] + '/bin', fae.ibins)
-else:
-  # Build the library.
-  SConscript(os.path.join('sources/core', env['LIBARCH'], 'SConscript'))
-  env.Install(env['instdir'] + '/lib', fae.ilibs)
-  env.Install(env['instdir'] + '/include', 'sources/rascal.h')
-
-# Install everything.
-env.Alias('install', env['instdir'])
+# Build the core library.
+core = fae.SharedLibrary(env, 'rascal',
+    ['sources/core/common', 'sources/core/' + env['LIBARCH']],
+    r'^.*\.cc$', CPPDEFINES = 'BUILD_RASCAL')
