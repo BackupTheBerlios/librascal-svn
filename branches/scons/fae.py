@@ -30,7 +30,6 @@ def fixenv(xenv, kw):
     env = xenv.Copy()
     for k, v in kw.items():
         env[k].append(v)
-
     if env['debug'] == 1:
         env.Append(CPPDEFINES = '_DEBUG')
         if env['CC'] == 'cl':
@@ -63,4 +62,6 @@ def SharedLibrary(xenv, name, paths, mask, **kw):
     env = fixenv(xenv, kw)
     for s, o in matchso(env, paths, mask):
         obj.append(env.SharedObject(o, s))
-    return env.SharedLibrary(name, obj)
+    lib = env.SharedLibrary(name, obj)
+    env.Alias('install', env['instdir'])
+    env.Install(env['instdir'] + '/lib', lib)
