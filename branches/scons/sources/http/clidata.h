@@ -44,8 +44,10 @@ private:
 	bool send_request();
 	// Send headers.
 	bool send_headers();
-	// Report a header to the client.
-	void report_header(const char *name, const char *value);
+	// Decode response code.
+	bool decode_response();
+	// Decode incoming headers.
+	bool decode_headers();
 public:
 	std::string mProto;
 	std::string mServer;

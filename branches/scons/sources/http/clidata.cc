@@ -118,65 +118,74 @@ void clidata::on_write()
 {
 }
 
-void clidata::on_read()
+bool clidata::decode_response()
+{
+	char tmp[4096], *p;
+	unsigned int sz = sizeof(tmp);
+	rrid_t rc = reads(tmp, sz);
+
+	if (strncmp(tmp, "HTTP/1.", 7) != 0) {
+		mClient->error("unsupported HTTP version");
+		return false;
+	}
+
+	for (p = tmp; *p != ' ' && *p != 0; ++p);
+	while (*p == ' ')
+		++p;
+
+	for (sz = 0; isdigit(*p); ++p)
+		sz = sz * 10 + (*p - '0');
+
+	while (*p == ' ')
+		++p;
+
+	mClient->on_response(sz, p);
+	mGotCode = true;
+	return true;
+}
+
+bool clidata::decode_headers()
 {
 	rrid_t rc;
-	unsigned int sz;
-	char tmp[4096], *p;
+	char tmp[4096];
 
-	if (!mGotCode) {
-		sz = sizeof(tmp);
-		rc = reads(tmp, sz);
+	for (unsigned int size = sizeof(tmp); rascal_isok(rc = reads(tmp, size, 0)); size = sizeof(tmp)) {
+		char *colon;
 
-		if (strncmp(tmp, "HTTP/1.", 7) != 0) {
-			mClient->error("unsupported HTTP version");
-			return;
+		if (tmp[0] == 0) {
+			mGotHeaders = true;
+			break;
 		}
 
-		for (p = tmp; *p != ' ' && *p != 0; ++p);
-		while (*p == ' ')
-			++p;
-
-		for (sz = 0; isdigit(*p); ++p)
-			sz = sz * 10 + (*p - '0');
-
-		while (*p == ' ')
-			++p;
-
-		mClient->on_response(sz, p);
-		mGotCode = true;
-	}
-
-	while (!mGotHeaders) {
-		for (unsigned int size = sizeof(tmp); rascal_isok(rc = reads(tmp, size, 0)); size = sizeof(tmp)) {
-			char *colon;
-
-			if (tmp[0] == 0) {
-				mGotHeaders = true;
-				break;
-			}
-
-			if ((colon = strchr(tmp, ':')) == NULL) {
-				mClient->error("malformed header: no colon");
-				mClient->error(tmp);
-				return;
-			}
-
-			for (*colon++ = 0; *colon == ' '; *colon++ = 0);
-			report_header(tmp, colon);
+		if ((colon = strchr(tmp, ':')) == NULL) {
+			mClient->error("malformed header: no colon");
+			return false;
 		}
+
+		for (*colon++ = 0; *colon == ' '; *colon++ = 0);
+
+		// Report the header.
+		if (strcasecmp(tmp, "transfer-encoding") == 0 && strcasecmp(colon, "chunked") == 0) {
+			if (mTransferDecoder == NULL)
+				mTransferDecoder = new dechunk(this);
+		}
+		mClient->on_header(tmp, colon);
 	}
 
-	if (!rascal_isok(rc = get_rq_size(sz))) {
-		report("read", rc);
-		return;
-	}
-
-	// Set the default decoder.  Not the best place for this,
-	// should be moved somewhere where it won't be called on
-	// every read.
-	if (mTransferDecoder == NULL)
+	if (mGotHeaders && mTransferDecoder == NULL)
 		mTransferDecoder = new debase(this);
+
+	return true;
+}
+
+void clidata::on_read()
+{
+	if (!mGotCode && !decode_response())
+		return;
+
+	while (!mGotHeaders)
+		if (!decode_headers())
+			return;
 
 	mTransferDecoder->pass();
 }
@@ -225,14 +234,4 @@ bool clidata::send_headers()
 	}
 
 	return true;
-}
-
-void clidata::report_header(const char *name, const char *value)
-{
-	if (strcasecmp(name, "transfer-encoding") == 0 && strcasecmp(value, "chunked") == 0) {
-		if (mTransferDecoder != NULL)
-			return;
-		mTransferDecoder = new dechunk(this);
-	}
-	mClient->on_header(name, value);
 }
