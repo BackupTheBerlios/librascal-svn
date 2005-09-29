@@ -16,8 +16,8 @@ Usage: scons [options]
 
 The following options are available:
 
-    debug=yes        : include debug symbols and output.
-    samples=yes    : build sample programs, too.
+    debug=yes    : include debug symbols and output.
+    samples=yes  : build sample programs, too.
     instdir=path : override the deployment destination.
 
 Send your comments to Justin Forest <justin.forest@gmail.com>
@@ -87,13 +87,20 @@ if not env.GetOption('clean'):
         Exit(1)
     env = conf.Finish()
 
+# Save command-line options.
+opts.Save('config.options', env)
+
 # Choose the platform.
 if Platform() == 'win32':
     env['LIBARCH'] = 'nt'
 else:
     env['LIBARCH'] = 'bsd'
 
-# Build the core library.
-core = fae.SharedLibrary(env, 'rascal',
+# Build the libraries.
+libcore = fae.SharedLibrary(env, 'rascal',
     ['sources/core/common', 'sources/core/' + env['LIBARCH']],
     r'^.*\.cc$', CPPDEFINES = 'BUILD_RASCAL')
+libhttp = fae.SharedLibrary(env, 'rahttp', ['sources/http'], CPPPATH = 'sources/core', LIBS = 'rascal', LIBPATH = '.')
+
+# Build the demo tools.
+rahttp = fae.Program(env, 'rahttp', ['sources/rahttp'], CPPPATH = 'sources/core', LIBS = 'rahttp', LIBPATH = '.')

@@ -51,6 +51,10 @@ public:
 	{
 		mConn = REC_UNKNOWN_ERROR;
 	}
+	bool isok() const
+	{
+		return rascal_isok(mConn);
+	}
 	rrid_t accept(const sock_t *addr)
 	{
 		return mConn = rascal_accept(addr, sdisp, this);
@@ -107,10 +111,6 @@ public:
 	}
 protected:
 	// Callbacks.
-	virtual int on_disp(rrid_t conn, const sock_t *peer, int event)
-	{
-		return 1;
-	}
 	virtual int on_filter(const sock_t *addr)
 	{
 		return 1;
@@ -121,11 +121,33 @@ protected:
 	virtual void on_gethost(const addr_t *addr, unsigned int count, const char **hosts)
 	{
 	}
+protected:
+	virtual void on_read() { }
+	virtual void on_write() { }
+	virtual bool on_connect(rrid_t rc, const sock_t &peer) { return true; }
+	virtual void on_close(rrid_t rc) { }
+	virtual bool on_event(rrid_t conn, const sock_t &peer, int event) { return true; }
 private:
 	// Callback wrappers.
-	static int __rascall sdisp(rrid_t c, const sock_t *peer, int event, void *context)
+	static int __rascall sdisp(rrid_t rc, const sock_t *peer, int event, void *context)
 	{
-		return reinterpret_cast<conn *>(context)->on_disp(c, peer, event);
+		conn *c = reinterpret_cast<conn *>(context);
+		switch (event) {
+		case rop_connect:
+			c->mConn = rc;
+			return c->on_connect(rc, *peer);
+		case rop_close:
+			c->on_close(rc);
+			return 1;
+		case rop_read:
+			c->on_read();
+			return 1;
+		case rop_write:
+			c->on_write();
+			return 1;
+		default:
+			return c->on_event(rc, *peer, event);
+		}
 	}
 	static int __rascall sfilter(void *context, const sock_t *addr)
 	{

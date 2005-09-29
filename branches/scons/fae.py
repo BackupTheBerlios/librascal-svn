@@ -29,7 +29,10 @@ def list(at, r):
 def fixenv(xenv, kw):
     env = xenv.Copy()
     for k, v in kw.items():
-        env[k].append(v)
+        if env.has_key(k):
+            env[k].append(v)
+        else:
+            env[k] = v
     if env['debug'] == 1:
         env.Append(CPPDEFINES = '_DEBUG')
         if env['CC'] == 'cl':
@@ -47,21 +50,28 @@ def fixenv(xenv, kw):
     return env
 
 # Build the list of source/object file name pairs.
-def matchso(env, paths, mask):
+def matchso(env, paths, mask, suffix):
     items = []
     for item in list(paths, mask):
         fname, ext = os.path.splitext(item)
         if env['debug'] == 1:
             fname = fname + '~debug'
-        items.append((item, fname + '~shared.o'))
+        fname += '~' + suffix
+        items.append((item, fname + '.o'))
     return items
 
 # Build a shared library, fixing object file names.
-def SharedLibrary(xenv, name, paths, mask, **kw):
+def SharedLibrary(xenv, name, paths, mask = r'^.*\.cc$', **kw):
     obj = []
     env = fixenv(xenv, kw)
-    for s, o in matchso(env, paths, mask):
+    for s, o in matchso(env, paths, mask, 'shared'):
         obj.append(env.SharedObject(o, s))
     lib = env.SharedLibrary(name, obj)
-    env.Alias('install', env['instdir'])
-    env.Install(env['instdir'] + '/lib', lib)
+
+# Build a program.
+def Program(xenv, name, paths, mask = r'^.*\.cc$', **kw):
+    obj = []
+    env = fixenv(xenv, kw)
+    for s, o in matchso(env, paths, mask, 'static'):
+        obj.append(env.Object(o, s))
+    lib = env.Program(name, obj)

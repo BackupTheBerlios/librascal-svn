@@ -22,9 +22,11 @@ enum raloglev
 
 #if defined(_DEBUG) && defined(HAVE_flog)
 # include <flog.h>
-# define debug(str) flog_write str
+# define xdebug(str) flog_write str
+# define debug(str) radebug str
 extern flog_t flog;
 void debug_init(void);
+void radebug(flog_t f, int level, const char *, ...);
 #else
 # define debug(str)
 # define debug_init()
