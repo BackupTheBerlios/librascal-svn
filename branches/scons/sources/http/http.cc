@@ -8,7 +8,6 @@
 # include <stdio.h>
 #endif
 #include <string>
-#include "cache.h"
 #include "clidata.h"
 #include "http.h"
 
